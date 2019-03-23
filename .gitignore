@@ -58,7 +58,7 @@ Makefile.in
 # Executables
 *.out
 *.app
-/src/moba-connector
+/src/moba-blocksystem
 /libtool
 /config.status
 /configure.scan
