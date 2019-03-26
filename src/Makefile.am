@@ -3,7 +3,8 @@ bin_PROGRAMS = \
     moba-blocksystem
 
 moba_blocksystem_SOURCES = \
-    main.cpp 
+    main.cpp \
+    msgloop.cpp
 
 moba_blocksystem_LDADD = \
     -lMoBaCommon $(GTKMM_LIBS) \

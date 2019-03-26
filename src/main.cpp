@@ -30,6 +30,10 @@
 
 #include "moba/socket.h"
 #include "moba/endpoint.h"
+#include "moba/layouthandler.h"
+#include "msgloop.h"
+
+#include <unistd.h>
 
 namespace {
     moba::AppData appData = {
@@ -51,9 +55,18 @@ int main(int argc, char *argv[]) {
 
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
     auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
-    endpoint->connect();
 
-    
+    while(true) {
+        try {
+            endpoint->connect();
+            endpoint->sendMsg(LayoutGetLayoutReq{1});
 
-    return EXIT_SUCCESS;
+
+
+            exit(EXIT_SUCCESS);
+        } catch(std::exception &e) {
+            LOG(moba::LogLevel::NOTICE) << e.what() << std::endl;
+            sleep(4);
+        }
+    }
 }
