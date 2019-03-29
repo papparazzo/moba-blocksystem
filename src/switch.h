@@ -20,36 +20,34 @@
 
 #pragma once
 
-#include <exception>
-#include <string>
-#include <memory>
+#include "node.h"
 
-class NodeException : public std::exception {
+class Switch : public Node {
+    public:
+        enum SwitchState {
+            BEND,
+            STRAIGHT,
+        };
 
-    std::string what_;
+        Switch(NodePtr in, SwitchState state);
+        Switch(SwitchState state);
 
-public:
-    explicit NodeException(const std::string &err) throw() : what_{err} {
-    }
+        virtual ~Switch();
 
-    NodeException() throw() : what_{"Unknown error"} {
-    }
+        void setOutStraightNode(NodePtr node);
 
-    virtual ~NodeException() throw() {
-    }
+        void setOutBendNode(NodePtr node);
 
-    virtual const char *what() const throw() {
-        return this->what_.c_str();
-    }
+        bool turnSwitch(Switch::SwitchState state);
+
+        void setInNode(NodePtr node);
+
+        virtual NodePtr getJunctionNode(NodePtr node) const;
+
+    protected:
+        NodePtr in;
+        NodePtr outStraight;
+        NodePtr outBend;
+        SwitchState currentState;
 };
-
-class Node;
-using NodePtr = std::shared_ptr<Node>;
-
-class Node {
-public:
-    virtual ~Node() {};
-    virtual NodePtr getJunctionNode(NodePtr node) const = 0;
-};
-
 

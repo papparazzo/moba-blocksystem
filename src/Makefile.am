@@ -5,7 +5,7 @@ bin_PROGRAMS = \
 moba_blocksystem_SOURCES = \
     main.cpp \
     msgloop.cpp \
-    node.cpp
+    switch.cpp
 
 moba_blocksystem_LDADD = \
     -lMoBaCommon $(GTKMM_LIBS) \
