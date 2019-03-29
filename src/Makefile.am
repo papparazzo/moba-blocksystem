@@ -6,6 +6,7 @@ moba_blocksystem_SOURCES = \
     main.cpp \
     msgloop.cpp \
     train.cpp \
+    node_block.cpp \
     node_switch.cpp \
     node_terminator.cpp
 
