@@ -4,7 +4,8 @@ bin_PROGRAMS = \
 
 moba_blocksystem_SOURCES = \
     main.cpp \
-    msgloop.cpp
+    msgloop.cpp \
+    node.cpp
 
 moba_blocksystem_LDADD = \
     -lMoBaCommon $(GTKMM_LIBS) \
@@ -15,6 +16,7 @@ LDFLAGS += -L/usr/local/lib
 AM_CPPFLAGS = \
     $(GTKMM_CFLAGS) \
     -I$(srcdir)/../modules/lib-msghandling/src \
+    -I$(srcdir)/../modules/lib-tracklayout/src \
     -g3 -g -ggdb -O3 -Wall
 
 CLEANFILES = *~
