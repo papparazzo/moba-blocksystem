@@ -22,23 +22,23 @@
 
 #include "node.h"
 
-class NodeSwitch : public Node {
+class Switch : public Node {
     public:
         enum SwitchState {
             BEND,
             STRAIGHT,
         };
 
-        NodeSwitch(NodePtr in, SwitchState state);
-        NodeSwitch(SwitchState state);
+        Switch(NodePtr in, SwitchState state);
+        Switch(SwitchState state);
 
-        virtual ~NodeSwitch();
+        virtual ~Switch();
 
         void setOutStraightNode(NodePtr node);
 
         void setOutBendNode(NodePtr node);
 
-        bool turnSwitch(NodeSwitch::SwitchState state);
+        bool turnSwitch(Switch::SwitchState state);
 
         void setInNode(NodePtr node);
 

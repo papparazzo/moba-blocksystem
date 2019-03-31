@@ -20,28 +20,28 @@
 
 #include "node_switch.h"
 
-NodeSwitch::NodeSwitch(NodePtr in, SwitchState state) : in{in}, currentState{state} {
+Switch::Switch(NodePtr in, SwitchState state) : in{in}, currentState{state} {
 }
 
-NodeSwitch::NodeSwitch(SwitchState state) : currentState{state} {
+Switch::Switch(SwitchState state) : currentState{state} {
 }
 
-NodeSwitch::~NodeSwitch() {
+Switch::~Switch() {
 }
 
-void NodeSwitch::setInNode(NodePtr node) {
+void Switch::setInNode(NodePtr node) {
     in = node;
 }
 
-void NodeSwitch::setOutStraightNode(NodePtr node) {
+void Switch::setOutStraightNode(NodePtr node) {
     outStraight = node;
 }
 
-void NodeSwitch::setOutBendNode(NodePtr node) {
+void Switch::setOutBendNode(NodePtr node) {
     outBend = node;
 }
 
-bool NodeSwitch::turnSwitch(NodeSwitch::SwitchState state) {
+bool Switch::turnSwitch(Switch::SwitchState state) {
     if(state == currentState) {
         return false;
     }
@@ -49,7 +49,7 @@ bool NodeSwitch::turnSwitch(NodeSwitch::SwitchState state) {
     return true;
 }
 
-NodePtr NodeSwitch::getJunctionNode(NodePtr node) const {
+NodePtr Switch::getJunctionNode(NodePtr node) const {
     if(node == outStraight && currentState == SwitchState::STRAIGHT) {
         return in;
     }
