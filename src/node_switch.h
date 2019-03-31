@@ -22,6 +22,10 @@
 
 #include "node.h"
 
+class Switch;
+
+using SwitchPtr = std::shared_ptr<Switch>;
+
 class Switch : public Node {
     public:
         enum SwitchState {

@@ -24,6 +24,10 @@
 #include "train.h"
 #include "moba/interfacehandler.h"
 
+class Terminator;
+
+using TerminatorPtr = std::shared_ptr<Terminator>;
+
 class Terminator : public Node {
 public:
     Terminator(NodePtr in, Contact contact, TrainPtr train);
