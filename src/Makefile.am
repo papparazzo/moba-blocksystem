@@ -8,7 +8,8 @@ moba_blocksystem_SOURCES = \
     train.cpp \
     node_block.cpp \
     node_switch.cpp \
-    node_terminator.cpp
+    node_terminator.cpp \
+    node_crossoverswitch.cpp
 
 moba_blocksystem_LDADD = \
     -lMoBaCommon $(GTKMM_LIBS) \
