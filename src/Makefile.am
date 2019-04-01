@@ -9,7 +9,8 @@ moba_blocksystem_SOURCES = \
     node_block.cpp \
     node_switch.cpp \
     node_terminator.cpp \
-    node_crossoverswitch.cpp
+    node_crossoverswitch.cpp \
+    node_threewayswitch.cpp
 
 moba_blocksystem_LDADD = \
     -lMoBaCommon $(GTKMM_LIBS) \
