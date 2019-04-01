@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "moba/symbol.h"
-#include "container.h"
+#include "moba/container.h"
 #include "moba/position.h"
 
 using LayoutContainer = std::shared_ptr<Container<std::shared_ptr<Symbol>>>;
@@ -36,3 +36,40 @@ enum class BlockDirection {
     OUT_TO_OUT,
     BOTH
 };
+
+
+/*
+ public enum DrivingDirection implements JSONToStringI {
+    FORWARD,
+    BACKWARD;
+
+    protected final int value;
+
+    private DrivingDirection() {
+        value = ordinal();
+    }
+
+    public static DrivingDirection flip(DrivingDirection d) {
+        switch(d) {
+            case BACKWARD:
+                return FORWARD;
+
+            case FORWARD:
+                return BACKWARD;
+
+            default:
+                throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    @Override
+    public String toJsonString(boolean formated, int indent)
+    throws JSONException, IOException {
+        StringBuilder b = new StringBuilder();
+        b.append('"');
+        b.append(DrivingDirection.values()[value].toString());
+        b.append('"');
+        return b.toString();
+    }
+}
+*/
