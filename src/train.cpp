@@ -20,12 +20,27 @@
 
 #include "train.h"
 
-Train::Train() {
-}
-
-Train::Train(const Train& orig) {
+Train::Train(
+    int address, int speed, DrivingDirection virt, DrivingDirection real
+) : address {address}, speed{speed}, realDirection{real}, virtualDirection{virt} {
 }
 
 Train::~Train() {
 }
 
+ void Train::switchVirtualDirection() {
+    //virtualDirection = DrivingDirection.flip(virtualDirection);
+}
+
+void Train::switchRealDirection() {
+    //realDirection = DrivingDirection.flip(realDirection);
+    switchVirtualDirection();
+}
+
+int Train::getSpeed() {
+    return speed;
+}
+
+int Train::getAddress() {
+    return address;
+}

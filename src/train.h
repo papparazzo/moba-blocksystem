@@ -22,13 +22,28 @@
 
 #include <memory>
 
+#include "common.h"
+
 class Train {
 public:
-    Train();
-    Train(const Train& orig);
+    Train(int address, int speed, DrivingDirection virt, DrivingDirection real);
     virtual ~Train();
-private:
+
+    void switchVirtualDirection();
+    void switchRealDirection();
+
+    int getSpeed();
+    int getAddress();
+
+protected:
+    DrivingDirection realDirection;
+	DrivingDirection virtualDirection;
+
+    int address;
+    int speed;
+    bool hasStopped;
 
 };
 
 using TrainPtr = std::shared_ptr<Train>;
+
