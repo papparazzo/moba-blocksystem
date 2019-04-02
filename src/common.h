@@ -37,19 +37,21 @@ enum class BlockDirection {
     BOTH
 };
 
+class DrivingDirection {
+public:
+    enum DrivingDirectionEnum {
+        FORWARD,
+        BACKWARD
+    };
 
-/*
- public enum DrivingDirection implements JSONToStringI {
-    FORWARD,
-    BACKWARD;
-
-    protected final int value;
-
-    private DrivingDirection() {
-        value = ordinal();
+    DrivingDirection(DrivingDirectionEnum val) : value{val} {
     }
 
-    public static DrivingDirection flip(DrivingDirection d) {
+protected:
+    DrivingDirectionEnum value;
+
+
+    static DrivingDirection flip(DrivingDirectionEnum d) {
         switch(d) {
             case BACKWARD:
                 return FORWARD;
@@ -57,11 +59,11 @@ enum class BlockDirection {
             case FORWARD:
                 return BACKWARD;
 
-            default:
-                throw new UnsupportedOperationException("Not supported.");
+            //default:
+                //throw new UnsupportedOperationException("Not supported.");
         }
     }
-
+/*
     @Override
     public String toJsonString(boolean formated, int indent)
     throws JSONException, IOException {
@@ -71,5 +73,6 @@ enum class BlockDirection {
         b.append('"');
         return b.toString();
     }
+ * */
 }
-*/
+
