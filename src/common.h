@@ -47,11 +47,11 @@ public:
     DrivingDirection(DrivingDirectionEnum val) : value{val} {
     }
 
-protected:
-    DrivingDirectionEnum value;
+    static DrivingDirectionEnum flip(DrivingDirection d) {
+        return flip(d.value);
+    }
 
-
-    static DrivingDirection flip(DrivingDirectionEnum d) {
+    static DrivingDirectionEnum flip(DrivingDirectionEnum d) {
         switch(d) {
             case BACKWARD:
                 return FORWARD;
@@ -63,6 +63,11 @@ protected:
                 //throw new UnsupportedOperationException("Not supported.");
         }
     }
+
+protected:
+    DrivingDirectionEnum value;
+
+
 /*
     @Override
     public String toJsonString(boolean formated, int indent)
@@ -74,5 +79,5 @@ protected:
         return b.toString();
     }
  * */
-}
+};
 
