@@ -22,10 +22,30 @@
 
 #include <memory>
 #include <vector>
+#include <exception>
 
 #include "moba/symbol.h"
 #include "moba/container.h"
 #include "moba/position.h"
+
+class UnsupportedOperationException : public std::exception {
+    public:
+        explicit UnsupportedOperationException(const std::string &err) throw() : what_{err} {
+        }
+
+        UnsupportedOperationException() throw() : what_{"Unknown error"} {
+        }
+
+        virtual ~UnsupportedOperationException() throw() {
+        }
+
+        virtual const char *what() const throw() {
+            return this->what_.c_str();
+        }
+
+    private:
+        std::string what_;
+};
 
 using LayoutContainer = std::shared_ptr<Container<std::shared_ptr<Symbol>>>;
 
@@ -59,8 +79,8 @@ public:
             case FORWARD:
                 return BACKWARD;
 
-            //default:
-                //throw new UnsupportedOperationException("Not supported.");
+            default:
+                throw UnsupportedOperationException("Not supported.");
         }
     }
 
