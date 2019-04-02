@@ -29,11 +29,11 @@ Train::~Train() {
 }
 
  void Train::switchVirtualDirection() {
-    //virtualDirection = DrivingDirection.flip(virtualDirection);
+    virtualDirection = DrivingDirection::flip(virtualDirection);
 }
 
 void Train::switchRealDirection() {
-    //realDirection = DrivingDirection.flip(realDirection);
+    realDirection = DrivingDirection::flip(realDirection);
     switchVirtualDirection();
 }
 

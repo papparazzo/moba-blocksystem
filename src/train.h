@@ -36,13 +36,12 @@ public:
     int getAddress();
 
 protected:
-    DrivingDirection realDirection;
-	DrivingDirection virtualDirection;
-
     int address;
     int speed;
     bool hasStopped;
 
+    DrivingDirection realDirection;
+	DrivingDirection virtualDirection;
 };
 
 using TrainPtr = std::shared_ptr<Train>;
