@@ -31,8 +31,6 @@
 
 using LayoutContainer = std::shared_ptr<Container<std::shared_ptr<Symbol>>>;
 
-using LineVector = std::vector<std::vector<Position>>;
-
 enum class BlockDirection {
     IN_TO_OUT,
     OUT_TO_OUT,
