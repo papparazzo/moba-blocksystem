@@ -33,7 +33,7 @@ NodePtr Terminator::getJunctionNode(NodePtr node) const {
     if(node == in) {
         return NodePtr{};
     }
-    throw NodeException("invalid node given!");
+    throw NodeException{"invalid node given!"};
 }
 
 

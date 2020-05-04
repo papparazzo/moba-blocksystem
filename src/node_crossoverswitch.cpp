@@ -73,7 +73,7 @@ CrossOverSwitch::SwitchState CrossOverSwitch::turnSwitch() {
 
 NodePtr CrossOverSwitch::getJunctionNode(NodePtr node) const {
     if(node != inDiagonal && node != inVertical && node != outDiagonal && node != outVertical) {
-        throw NodeException("invalid node given!");
+        throw NodeException{"invalid node given!"};
     }
 
     auto activeIn = getInNode();

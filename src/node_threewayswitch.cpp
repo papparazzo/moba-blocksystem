@@ -20,8 +20,6 @@
 
 #include "node_threewayswitch.h"
 
-
-
 ThreeWaySwitch::ThreeWaySwitch(NodePtr in, ThreeWaySwitch::SwitchState state) : in{in}, currentState{state} {
 }
 
