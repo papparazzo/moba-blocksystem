@@ -17,7 +17,7 @@ PKG_CHECK_MODULES([GTKMM], [gtkmm-3.0])
 
 AX_CXX_COMPILE_STDCXX_11()
 
-AC_CHECK_LIB([MoBaCommon], [main])
+AC_CHECK_LIB([mobacommon], [main])
 
 AC_CONFIG_FILES([
     Makefile
