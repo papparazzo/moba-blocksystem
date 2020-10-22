@@ -14,7 +14,7 @@ moba_blocksystem_SOURCES = \
     contacttoblock.cpp
 
 moba_blocksystem_LDADD = \
-    -lMoBaCommon $(GTKMM_LIBS) \
+    -lmobacommon $(GTKMM_LIBS) \
     $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a
 
 LDFLAGS += -L/usr/local/lib

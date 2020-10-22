@@ -22,7 +22,7 @@
 
 #include "node.h"
 #include "train.h"
-#include "moba/interfacehandler.h"
+#include "moba/interfacemessage.h"
 
 class Terminator;
 

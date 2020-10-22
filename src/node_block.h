@@ -25,7 +25,7 @@
 #include "node.h"
 #include "common.h"
 #include "train.h"
-#include "moba/interfacehandler.h"
+#include "moba/interfacemessage.h"
 
 class Block;
 

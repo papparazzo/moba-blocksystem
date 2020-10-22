@@ -23,8 +23,8 @@
 #include <memory>
 #include <thread>
 
-#include <moba/helper.h>
-#include <moba/log.h>
+#include <moba-common/helper.h>
+#include <moba-common/log.h>
 
 #include "config.h"
 
@@ -36,9 +36,9 @@
 #include <unistd.h>
 
 namespace {
-    moba::AppData appData = {
+    moba::common::AppData appData = {
         PACKAGE_NAME,
-        moba::Version(PACKAGE_VERSION),
+        moba::common::Version(PACKAGE_VERSION),
         __DATE__,
         __TIME__,
         "::1",
@@ -47,7 +47,7 @@ namespace {
 }
 
 int main(int argc, char *argv[]) {
-    moba::setCoreFileSizeToULimit();
+    moba::common::setCoreFileSizeToULimit();
 
     auto groups = Groups::CLIENT | Groups::LAYOUT | Groups::INTERFACE;
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 
             exit(EXIT_SUCCESS);
         } catch(std::exception &e) {
-            LOG(moba::LogLevel::NOTICE) << e.what() << std::endl;
+            LOG(moba::common::LogLevel::NOTICE) << e.what() << std::endl;
             sleep(4);
         }
     }

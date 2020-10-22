@@ -27,7 +27,7 @@
 #include "moba/symbol.h"
 #include "moba/container.h"
 #include "moba/position.h"
-#include <moba/exception.h>
+#include <moba-common/exception.h>
 
 using LayoutContainer = std::shared_ptr<Container<std::shared_ptr<Symbol>>>;
 
@@ -60,7 +60,7 @@ public:
                 return BACKWARD;
 
             default:
-                throw moba::UnsupportedOperationException("Not supported.");
+                throw moba::common::UnsupportedOperationException{"Not supported."};
         }
     }
 
