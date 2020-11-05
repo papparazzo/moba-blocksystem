@@ -20,6 +20,10 @@
 
 #pragma once
 
+#include "moba/shared.h"
+#include "node_block.h"
+#include <map>
+
 class ContactToBlock {
 public:
     ContactToBlock();
