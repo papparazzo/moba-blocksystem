@@ -21,13 +21,10 @@
 #include "contacttoblock.h"
 
 ContactToBlock::ContactToBlock() {
+//     map = new HashMap<>();
 }
 
 ContactToBlock::~ContactToBlock() {
-}
-
-void ContactToBlock::ContactToBlock() {
-//     map = new HashMap<>();
 }
 
 void ContactToBlock::addBlock(Contact contact, Block block) {
