@@ -49,9 +49,8 @@ namespace {
 int main(int argc, char *argv[]) {
     moba::common::setCoreFileSizeToULimit();
 
-    auto groups = Groups::CLIENT | Groups::LAYOUT | Groups::INTERFACE;
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
+    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::CLIENT, Message::LAYOUT, Message::INTERFACE}}};
 
     while(true) {
         try {
