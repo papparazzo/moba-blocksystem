@@ -28,7 +28,7 @@ Train::Train(
 Train::~Train() {
 }
 
- void Train::switchVirtualDirection() {
+void Train::switchVirtualDirection() {
     virtualDirection = DrivingDirection::flip(virtualDirection);
 }
 

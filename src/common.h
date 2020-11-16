@@ -67,17 +67,5 @@ public:
 protected:
     DrivingDirectionEnum value;
 
-
-/*
-    @Override
-    public String toJsonString(boolean formated, int indent)
-    throws JSONException, IOException {
-        StringBuilder b = new StringBuilder();
-        b.append('"');
-        b.append(DrivingDirection.values()[value].toString());
-        b.append('"');
-        return b.toString();
-    }
- * */
 };
 
