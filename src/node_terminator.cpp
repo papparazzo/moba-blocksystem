@@ -23,10 +23,10 @@
 Terminator::~Terminator() {
 }
 
-Terminator::Terminator(NodePtr in, Contact contact, TrainPtr train) : in{in}, contact{contact}, train{train} {
+Terminator::Terminator(NodePtr in, ContactData contact, TrainPtr train) : in{in}, contact{contact}, train{train} {
 }
 
-Terminator::Terminator(NodePtr in, Contact contact) : in{in}, contact{contact} {
+Terminator::Terminator(NodePtr in, ContactData contact) : in{in}, contact{contact} {
 }
 
 NodePtr Terminator::getJunctionNode(NodePtr node) const {

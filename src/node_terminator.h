@@ -30,8 +30,8 @@ using TerminatorPtr = std::shared_ptr<Terminator>;
 
 class Terminator : public Node {
 public:
-    Terminator(NodePtr in, Contact contact, TrainPtr train);
-    Terminator(NodePtr in, Contact contact);
+    Terminator(NodePtr in, ContactData contact, TrainPtr train);
+    Terminator(NodePtr in, ContactData contact);
 
     virtual ~Terminator();
 
@@ -39,6 +39,6 @@ public:
 
 private:
     NodePtr in;
-    Contact contact;
+    ContactData contact;
     TrainPtr train;
 };
