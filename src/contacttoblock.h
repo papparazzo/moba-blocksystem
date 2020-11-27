@@ -34,13 +34,13 @@ public:
      * @param contact
      * @param block
      */
-    void addBlock(Contact contact, Block block);
+    void addBlock(ContactData contact, Block block);
 
-    void freeBlock(Contact contact);
+    void freeBlock(ContactData contact);
 
-    void blockBlock(Contact contact);
+    void blockBlock(ContactData contact);
 
 private:
-    std::map<> vector;
+    //std::map<> vector;
 };
 

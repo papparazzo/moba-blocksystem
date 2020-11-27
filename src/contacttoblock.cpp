@@ -27,11 +27,11 @@ ContactToBlock::ContactToBlock() {
 ContactToBlock::~ContactToBlock() {
 }
 
-void ContactToBlock::addBlock(Contact contact, Block block) {
+void ContactToBlock::addBlock(ContactData contact, Block block) {
 //    map.put(contact, block);
 }
 
-void ContactToBlock::freeBlock(Contact contact) {
+void ContactToBlock::freeBlock(ContactData contact) {
  /*
     if(!map.containsKey(contact)) {
         return;
@@ -40,7 +40,7 @@ void ContactToBlock::freeBlock(Contact contact) {
   */
 }
 
-void ContactToBlock::blockBlock(Contact contact) {
+void ContactToBlock::blockBlock(ContactData contact) {
 /*
     if(!map.containsKey(contact)) {
         return;
