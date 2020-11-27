@@ -24,7 +24,6 @@
 #include <thread>
 
 #include <moba-common/helper.h>
-#include <moba-common/log.h>
 
 #include "config.h"
 
@@ -52,17 +51,6 @@ int main(int argc, char *argv[]) {
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
     auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::CLIENT, Message::LAYOUT, Message::INTERFACE}}};
 
-    while(true) {
-        try {
-            endpoint->connect();
-            endpoint->sendMsg(LayoutGetLayoutReq{1});
-
-
-
-            exit(EXIT_SUCCESS);
-        } catch(std::exception &e) {
-            LOG(moba::common::LogLevel::NOTICE) << e.what() << std::endl;
-            sleep(4);
-        }
-    }
+    MessageLoop loop(endpoint);
+    loop.run();
 }

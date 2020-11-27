@@ -21,14 +21,20 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
+
+#include "moba/layouthandler.h"
+#include "moba/interfacemessage.h"
 #include "moba/endpoint.h"
 
 class MessageLoop : private boost::noncopyable {
-    public:
-        MessageLoop(EndpointPtr endpoint);
 
-        void run();
-        void init();
+    EndpointPtr endpoint;
+    bool closing;
 
-        EndpointPtr endpoint;
+    void parseLayout(const LayoutGetLayoutRes &d);
+    void contactTriggered(const InterfaceContactTriggered &d);
+
+public:
+    MessageLoop(EndpointPtr endpoint);
+    void run();
 };

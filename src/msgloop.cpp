@@ -18,17 +18,40 @@
  *
  */
 
+#include <thread>
+#include <moba-common/log.h>
+
 #include "msgloop.h"
+#include "moba/registry.h"
+#include "layoutparser.h"
 
 MessageLoop::MessageLoop(EndpointPtr endpoint) : endpoint{endpoint} {
 }
 
 void MessageLoop::run() {
-    while(true) {
-        auto msg = endpoint->waitForNewMsg();
+    while(!closing) {
+        try {
+            endpoint->connect();
+            endpoint->sendMsg(LayoutGetLayoutReadOnlyReq{});
+
+            Registry registry;
+            registry.registerHandler<LayoutGetLayoutRes>([this](const LayoutGetLayoutRes &d){parseLayout(d);});
+            registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d){contactTriggered(d);});
+
+            while(true) {
+                registry.handleMsg(endpoint->waitForNewMsg());
+            }
+        } catch(const std::exception &e) {
+            LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
 }
 
-void MessageLoop::init() {
+void MessageLoop::parseLayout(const LayoutGetLayoutRes &d) {
+    LayoutParser parser;
+}
+
+void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
 
 }
