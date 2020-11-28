@@ -34,9 +34,9 @@ using BlockPtr = std::shared_ptr<Block>;
 class Block : public Node {
 
     public:
-        Block(NodePtr in, Contact contact, TrainPtr train, BlockDirection direction);
+        Block(NodePtr in, ContactData contact, TrainPtr train, BlockDirection direction);
 
-        Block(NodePtr in, Contact contact);
+        Block(NodePtr in, ContactData contact);
 
         virtual ~Block();
 
@@ -44,7 +44,7 @@ class Block : public Node {
         NodePtr in;
         NodePtr out;
 
-        Contact contact;
+        ContactData contact;
         TrainPtr train;
 
         BlockDirection direction;

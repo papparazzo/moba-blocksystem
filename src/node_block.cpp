@@ -21,11 +21,11 @@
 #include "node_block.h"
 
 Block::Block(
-    NodePtr in, Contact contact, TrainPtr train, BlockDirection direction
+    NodePtr in, ContactData contact, TrainPtr train, BlockDirection direction
 ) : in{in}, contact{contact}, train{train}, direction{direction} {
 }
 
-Block::Block(NodePtr in, Contact contact) : in{in}, contact{contact} {
+Block::Block(NodePtr in, ContactData contact) : in{in}, contact{contact} {
 }
 
 Block::~Block() {
@@ -38,7 +38,7 @@ NodePtr Block::getJunctionNode(NodePtr node) const {
     if(node == out) {
         return in;
     }
-    throw NodeException("invalid node given!");
+    throw NodeException{"invalid node given!"};
 }
 
 BlockPtr Block::getNextBlock() const {
