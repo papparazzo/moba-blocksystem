@@ -35,7 +35,7 @@ void MessageLoop::run() {
             endpoint->sendMsg(LayoutGetLayoutReadOnlyReq{});
 
             Registry registry;
-            registry.registerHandler<LayoutGetLayoutRes>([this](const LayoutGetLayoutRes &d){parseLayout(d);});
+            registry.registerHandler<GetLayout>([this](const GetLayout &d){parseLayout(d);});
             registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d){contactTriggered(d);});
 
             while(true) {
@@ -48,8 +48,11 @@ void MessageLoop::run() {
     }
 }
 
-void MessageLoop::parseLayout(const LayoutGetLayoutRes &d) {
+void MessageLoop::parseLayout(const MessageLoop::GetLayout &d) {
+
+
     LayoutParser parser;
+    parser.parse();
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {

@@ -25,13 +25,28 @@
 #include "moba/layouthandler.h"
 #include "moba/interfacemessage.h"
 #include "moba/endpoint.h"
+#include <memory>
+#include "common.h"
 
 class MessageLoop : private boost::noncopyable {
+
+    struct GetLayout : public LayoutMessage {
+        static constexpr std::uint32_t MESSAGE_ID = LAYOUT_GET_LAYOUT_RES;
+
+        GetLayout(const rapidjson::Document &d) {
+            symbols = std::make_shared<LayoutContainer>();
+            for(auto &iter : d["symbols"].GetArray()) {
+                symbols->addItem({iter["xPos"].GetInt(), iter["yPos"].GetInt()}, std::make_shared<Symbols>(iter["symbol"].GetInt()));
+            }
+        }
+
+        LayoutContainer symbols;
+    };
 
     EndpointPtr endpoint;
     bool closing;
 
-    void parseLayout(const LayoutGetLayoutRes &d);
+    void parseLayout(const GetLayout &d);
     void contactTriggered(const InterfaceContactTriggered &d);
 
 public:
