@@ -50,6 +50,9 @@ bool Switch::turnSwitch(Switch::SwitchState state) {
 }
 
 NodePtr Switch::getJunctionNode(NodePtr node) const {
+    if(node != in && node != outStraight && node != outBend) {
+        throw NodeException{"invalid node given!"};
+    }
     if(node == outStraight && currentState == SwitchState::STRAIGHT) {
         return in;
     }
@@ -62,9 +65,6 @@ NodePtr Switch::getJunctionNode(NodePtr node) const {
     if(node == in && currentState == SwitchState::STRAIGHT) {
         return outStraight;
     }
-    if(node == outStraight || node == outBend) {
-        return NodePtr{};
-    }
-    throw NodeException("invalid node given!");
+    return NodePtr{};
 }
 

@@ -29,7 +29,8 @@
 #include "moba/position.h"
 #include <moba-common/exception.h>
 
-using LayoutContainer = std::shared_ptr<Container<std::shared_ptr<Symbol>>>;
+using SymbolPtr = std::shared_ptr<Symbol>;
+using LayoutContainerPtr = std::shared_ptr<Container<SymbolPtr>>;
 
 enum class BlockDirection {
     IN_TO_OUT,

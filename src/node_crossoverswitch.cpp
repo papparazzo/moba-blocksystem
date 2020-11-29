@@ -100,7 +100,7 @@ NodePtr CrossOverSwitch::getInNode() const {
         case STRAIGHT_2:
             return inVertical;
     }
-    throw NodeException("invalid state given!");
+    throw NodeException{"invalid state given!"};
 }
 
 NodePtr CrossOverSwitch::getOutNode() const {
@@ -113,5 +113,5 @@ NodePtr CrossOverSwitch::getOutNode() const {
         case STRAIGHT_2:
             return outVertical;
     }
-    throw NodeException("invalid state given!");
+    throw NodeException{"invalid state given!"};
 }

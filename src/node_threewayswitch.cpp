@@ -69,7 +69,7 @@ ThreeWaySwitch::SwitchState ThreeWaySwitch::turnSwitch() {
 
 NodePtr ThreeWaySwitch::getJunctionNode(NodePtr node) const {
     if(node != in && node != outStraight && node != outBendMinor && node != outBendMajor) {
-        throw NodeException("invalid node given!");
+        throw NodeException{"invalid node given!"};
     }
 
     if(node == in && currentState == ThreeWaySwitch::BEND_MAJOR) {
