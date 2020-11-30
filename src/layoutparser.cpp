@@ -23,16 +23,117 @@
 
 #include "layoutparser.h"
 #include "common.h"
+#include "node_block.h"
+#include "node_crossoverswitch.h"
+#include "node_threewayswitch.h"
 
-virtual LayoutParser::~LayoutParser() {
+void LayoutParser::fetchBlockNodes(Direction dir, Position pos, std::function<void(const NodePtr&)> fn) {
 
+    // So lange durchlaufen bis entweder Prellbock oder Weiche gefunden worden ist.
+    while(true) {
+        pos.setNewPosition(dir);
+
+        auto currSymbol = layout->get(pos);
+        currSymbol->removeJunction(getComplementaryDirection(dir));
+
+        if(currSymbol->isEnd()) {
+            if(this->lastBlock == null) {
+                throw LayoutParserException{"Termination without block"};
+            }
+            //this->lastBlock->setOut({});
+            return NodePtr{};
+        }
+
+        if(currSymbol->isBlockSymbol()) {
+            this->lastBlock = std::make_shared<Block>(lastBlock);
+        }
+
+        if(currSymbol->isTrack()) {
+            currSymbol->removeJunction
+            dir = currSymbol->getNextOpenJunction();
+            continue;
+        }
+
+        if(currSymbol->isSwitch()) {
+
+        }
+    }
 }
 
-void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
-    std::vector<Position> posVector;
+void LayoutParser::handleSwitch(Position pos) {
 
-    // Aktuelle Position speichern (ist quasi der Startpunkt)
-    posVector.push_back(pos);
+    auto currSymbol = layout->get(pos);
+
+    auto iter = nodes.find(pos);
+
+    NodePtr node;
+
+    if(iter == nodes.end()) {
+        if(currSymbol->isCrossOverSwitch()) {
+            node = std::make_shared<CrossOverSwitch>();;
+        } else if(currSymbol->isSwitch()) {
+            node = std::make_shared<Switch>();
+        } else if(currSymbol->isThreeWaySwitch()) {
+            node = std::make_shared<ThreeWaySwitch>();
+        }
+        nodes[pos] = node;
+    } else {
+        node = *iter;
+    }
+
+
+
+
+    switch(getDistanceType(openDir, compDir)) {
+        // Teil einer Weiche (kann z.B. bei einer Kehrschleife passieren)
+        case DistanceType::INVALID:
+             posVector.push_back(pos);
+             lines.push_back(std::move(posVector));
+             currSymbol->removeJunction(openDir);
+             collectTrackPoints(pos, openDir);
+             return;
+
+        case DistanceType::BEND:
+             posVector.push_back(pos);
+             dir = openDir;
+        case DistanceType::STRAIGHT:
+             currSymbol->removeJunction(dir);
+             continue; // einfaches Gleis -> weitermachen
+     }
+}
+
+NodePtr LayoutParser::parse(LayoutContainerPtr layout) {
+
+    this->layout = layout;
+
+    Position pos = layout->getNextMatchPosition([](SymbolPtr symbol) {return symbol->isBlockSymbol();});
+
+    auto currSymbol = layout->get(pos);
+
+    auto dir = currSymbol->getNextOpenJunction();
+
+    //this->lastBlock = std::make_shared<Block>();
+
+
+    this->fetchBlockNodes();
+
+
+
+
+
+
+    return tmpNode;
+}
+
+
+
+
+
+
+
+
+
+void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
 
     while(true) {
         // Nächsten Koordinaten der Richtung
@@ -41,34 +142,24 @@ void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
 
         // Verbindugspunkt entfernen (verhindert eine Endlosschleife)
         Direction compDir = getComplementaryDirection(dir);
-        currSymbol->removeJunktion(compDir);
+        currSymbol->removeJunction(compDir);
 
         // Wie viele Verbindungspunkte sind noch offen?
-        switch(currSymbol->getOpenJunktionsCount()) {
-            case 0: // Endgleis -> Funktion verlassen
-                posVector.push_back(pos);
-
-                this->node = std::make_shared<Node>();
-
-                lines.push_back(posVector);
-                return;
-
+        switch(currSymbol->getOpenJunctionsCount()) {
             case 1: {
-               auto openDir = currSymbol->getNextOpenJunktion();
+               auto openDir = currSymbol->getNextOpenJunction();
                switch(getDistanceType(openDir, compDir)) {
                    // Teil einer Weiche (kann z.B. bei einer Kehrschleife passieren)
                    case DistanceType::INVALID:
-                        posVector.push_back(pos);
-                        lines.push_back(std::move(posVector));
-                        currSymbol->removeJunktion(openDir);
+
+                        currSymbol->removeJunction(openDir);
                         collectTrackPoints(pos, openDir);
                         return;
 
                    case DistanceType::BEND:
-                        posVector.push_back(pos);
                         dir = openDir;
                    case DistanceType::STRAIGHT:
-                        currSymbol->removeJunktion(dir);
+                        currSymbol->removeJunction(dir);
                         continue; // einfaches Gleis -> weitermachen
                 }
             }
@@ -76,15 +167,14 @@ void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
             case 2:
             case 3: {
                 if(currSymbol->isCrossOver() || currSymbol->isCrossOverSwitch()) {
-                    pointsOfInterest.push_back(getNextBendPosition(pos, currSymbol->getNextOpenJunktion()));
+                    //pointsOfInterest.push_back(getNextBendPosition(pos, currSymbol->getNextOpenJunktion()));
                 } else {
                     pointsOfInterest.push_back(pos);
                 }
                 if(currSymbol->isOpenJunctionSet(dir)) {
-                    currSymbol->removeJunktion(dir);
+                    currSymbol->removeJunction(dir);
                     continue; // einfaches Gleis -> weitermachen
                 }
-                posVector.push_back(pos);
                 auto ndir = getNextLeftDirection(dir);
                 if(currSymbol->isOpenJunctionSet(ndir)) {
                     dir = ndir;
@@ -102,59 +192,5 @@ void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
                 throw LayoutParserException("invalid case");
         }
     }
-}
-
-Position LayoutParser::getRealStartPosition() {
-    Position pos = layout->getNextBoundPosition({0, 0});
-
-    auto currSymbol = layout->get(pos);
-
-    if(!currSymbol->isStartSymbol()) {
-        throw LayoutParserException("first symbol is not a start symbol");
-    }
-
-    return pos;
-}
-
-NodePtr LayoutParser::parse(LayoutContainer layout) {
-
-    this->layout = layout;
-
-    // Startpunkt ermitteln
-    pointsOfInterest.push_back(getRealStartPosition());
-
-    // So lange parsen, bis die Liste mit Startpunkten leer ist.
-    while(!pointsOfInterest.empty()) {
-        // Das erste Symbol der Liste holen und die Startrichtung ermitteln
-        auto pos = pointsOfInterest.front();
-        auto currSymbol = layout->get(pos);
-
-        Direction dir = currSymbol->getNextOpenJunktion(Direction::TOP);
-
-        // Falls das Symobl keine offenen Verbindungspunkte mehr aufweist dann
-        // das Element aus der Liste entfernen und mit dem nächsten Symbol fortfahren
-        if(dir == UNSET) {
-            pointsOfInterest.pop_front();
-            continue;
-        }
-        currSymbol->removeJunktion(dir);
-
-        collectTrackPoints(pos, dir);
-        if(currSymbol->hasOpenJunctionsLeft()) {
-            pointsOfInterest.push_back(pos);
-        }
-        pointsOfInterest.pop_front();
-    }
-    return node;
-}
-
-Position LayoutParser::getNextBendPosition(Position pos, Direction dir) {
-    std::shared_ptr<Symbol> currSymbol;
-    do {
-        // Nächstes Symobl der aus Richtung "dir" ermitteln
-        pos.setNewPosition(dir);
-        currSymbol = layout->get(pos);
-    } while(currSymbol->isOpenJunctionSet(dir));
-    return pos;
 }
 

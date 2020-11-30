@@ -20,8 +20,7 @@
 
 #pragma once
 
-#include <vector>
-#include <list>
+#include <map>
 #include <exception>
 
 #include "node.h"
@@ -53,52 +52,19 @@ class LayoutParserException : public std::exception {
 class LayoutParser {
 
     /**
-     * Der Startknoten
-     */
-    NodePtr node;
-
-    /**
      * Der zu parsende Gleisplan
      */
-    LayoutContainer layout;
+    LayoutContainerPtr layout;
 
-    /**
-     * Enthält sämtliche Weichen und Kreuzungen. Also Startpunkte von denen man aus
-     * den Gleisplan parsen kann.
-     */
-    std::list<Position> pointsOfInterest;
+    std::map<Position, NodePtr> nodes;
 
-    /**
-     * Parst den Gleisplan bis zu einem Endgleis. Alle Positionen
-     * von gebogenen Gleisen weden in einem Vektor gespeichert. Bei einem Endgleis wird
-     * die Funktion beendet, bei einer Weiche wird beim komplimentären Punkt ganz normal
-     * weiter gemacht und die Position im Vector pointsOfInterest gespeichert.
-     *
-     * @param pos Aktuelle Position beim Parsen
-     * @param dir Richtung in die weiter geparst werden soll
-     */
-    void collectTrackPoints(Position pos, Direction dir);
+    void fetchBlockNodes(Direction dir, Position pos);
 
-    /**
-     * Hangelt sich am Gleisplan entlang bis kein gerades Gleis mehr gefunden wurde,
-     * Bzw. bis es kein Symbol mehr gibt, welches in die Richtung "dir" weiterführt
-     *
-     * @param pos Startposition
-     * @param dir Richtung in der gesucht werden soll
-     * @return Position des Symbols welches kein gerades Gleis mehr darstellt
-     */
-    Position getNextBendPosition(Position pos, Direction dir);
-
-    /**
-     * Ermittelt einen definierten Startpunkt. Beginnt oben links und gibt Position
-     * des ersten Symbols zurück, welches entweder Weiche oder ein Endstück ist.
-     *
-     * @return
-     */
-    Position getRealStartPosition();
+    void handleSwitch(Position pos);
 
 public:
-    virtual ~LayoutParser();
+    virtual ~LayoutParser(){
+    }
 
     /**
      * Parst einen gesamten Gleisplan und liefert einen Baum zurück
@@ -106,7 +72,7 @@ public:
      * @param layout zwei-dimensionales Array mit dem Gleisplan
      * @return NodePtr
      */
-    NodePtr parse(LayoutContainer layout);
+    NodePtr parse(LayoutContainerPtr layout);
 };
 
 
