@@ -49,10 +49,8 @@ void MessageLoop::run() {
 }
 
 void MessageLoop::parseLayout(const MessageLoop::GetLayout &d) {
-
-
     LayoutParser parser;
-    parser.parse();
+    parser.parse(d.symbols);
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {

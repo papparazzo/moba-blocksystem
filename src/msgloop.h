@@ -34,13 +34,19 @@ class MessageLoop : private boost::noncopyable {
         static constexpr std::uint32_t MESSAGE_ID = LAYOUT_GET_LAYOUT_RES;
 
         GetLayout(const rapidjson::Document &d) {
-            symbols = std::make_shared<LayoutContainer>();
+            symbols = std::make_shared<Container<std::shared_ptr<Symbol>>>();
             for(auto &iter : d["symbols"].GetArray()) {
-                symbols->addItem({iter["xPos"].GetInt(), iter["yPos"].GetInt()}, std::make_shared<Symbols>(iter["symbol"].GetInt()));
+                symbols->addItem(
+                    {
+                        static_cast<std::size_t>(iter["xPos"].GetInt()),
+                        static_cast<std::size_t>(iter["yPos"].GetInt())
+                    },
+                    std::make_shared<Symbol>(iter["symbol"].GetInt())
+                );
             }
         }
 
-        LayoutContainer symbols;
+        LayoutContainerPtr symbols;
     };
 
     EndpointPtr endpoint;
