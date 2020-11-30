@@ -18,7 +18,7 @@
  *
  */
 
-#include "node_switch.h"
+#include "node_simpleswitch.h"
 
 Switch::Switch(NodePtr in, SwitchState state) : in{in}, currentState{state} {
 }
