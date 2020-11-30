@@ -3,19 +3,20 @@ bin_PROGRAMS = \
     moba-blocksystem
 
 moba_blocksystem_SOURCES = \
+    contacttoblock.cpp \
+    layoutparser.cpp \
     main.cpp \
     msgloop.cpp \
-    train.cpp \
     node_block.cpp \
-    node_switch.cpp \
-    node_terminator.cpp \
     node_crossoverswitch.cpp \
+    node_switch.cpp \
     node_threewayswitch.cpp \
-    contacttoblock.cpp
+    train.cpp
 
 moba_blocksystem_LDADD = \
     -lmobacommon $(GTKMM_LIBS) \
-    $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a
+    $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a \
+    $(srcdir)/../modules/lib-tracklayout/src/moba/libtracklayout.a
 
 LDFLAGS += -L/usr/local/lib
 
