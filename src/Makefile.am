@@ -7,10 +7,6 @@ moba_blocksystem_SOURCES = \
     layoutparser.cpp \
     main.cpp \
     msgloop.cpp \
-    node_block.cpp \
-    node_crossoverswitch.cpp \
-    node_switch.cpp \
-    node_threewayswitch.cpp \
     train.cpp
 
 moba_blocksystem_LDADD = \
