@@ -20,42 +20,80 @@
 
 #pragma once
 
-#include "node.h"
+#include "node_base_switch.h"
 
-class ThreeWaySwitch;
+struct ThreeWaySwitch : public BaseSwitch {
+  
+    virtual ~ThreeWaySwitch() {
+    }
 
-using ThreeWaySwitchPtr = std::shared_ptr<ThreeWaySwitch>;
+    void setInNode(NodePtr node) {
+        in = node;
+    }
 
-class ThreeWaySwitch : public Node {
-public:
-    enum SwitchState {
-        BEND_MINOR,
-        STRAIGHT_1,
-        BEND_MAJOR,
-        STRAIGHT_2,
-    };
+    void setOutStraight(NodePtr node) {
+        outStraight = node;
+    }
 
-    ThreeWaySwitch(NodePtr in, SwitchState state);
+    void setOutBendLeft(NodePtr node) {
+        outBendLeft = node;
+    }
 
-    virtual ~ThreeWaySwitch();
+    void setOutBendRight(NodePtr node) {
+        outBendRight = node;
+    }
 
-    void setOutStraight(NodePtr node);
+    SwitchState turnSwitch() {
+        switch(currentState) {
+            case SwitchState::BEND_1:
+                return currentState = SwitchState::STRAIGHT_1;
 
-    void setOutBendMinor(NodePtr node);
+            case SwitchState::STRAIGHT_1:
+                return currentState = SwitchState::BEND_2;
 
-    void setOutBendMajor(NodePtr node);
+            case SwitchState::BEND_2:
+                return currentState = SwitchState::STRAIGHT_2;
 
-    bool turnSwitch(SwitchState state);
+            case SwitchState::STRAIGHT_2:
+                return currentState = SwitchState::BEND_1;
+        }
+    }
 
-    SwitchState turnSwitch();
+    NodePtr getJunctionNode(NodePtr node) const {
+        if(node != in && node != outStraight && node != outBendLeft && node != outBendRight) {
+            throw NodeException{"invalid node given!"};
+        }
 
-    NodePtr getJunctionNode(NodePtr node) const;
+        if(node == in && currentState == SwitchState::BEND_2) {
+            return outBendLeft;
+        }
 
-private:
+        if(node == in && currentState == SwitchState::BEND_1) {
+            return outBendRight;
+        }
+
+        if(node == in) {
+            return outStraight;
+        }
+
+        if(node == outBendLeft && currentState == SwitchState::BEND_2) {
+            return in;
+        }
+
+        if(node == outBendRight && currentState == SwitchState::BEND_1) {
+            return in;
+        }
+
+        if(node == outStraight && (currentState == SwitchState::STRAIGHT_1 || currentState == SwitchState::STRAIGHT_2)) {
+            return in;
+        }
+
+        return NodePtr{};
+    }
+
+protected:
     NodePtr in;
     NodePtr outStraight;
-    NodePtr outBendMinor;
-    NodePtr outBendMajor;
-
-    SwitchState currentState;
+    NodePtr outBendLeft;
+    NodePtr outBendRight;
 };

@@ -20,51 +20,90 @@
 
 #pragma once
 
-#include "node.h"
+#include "node_base_switch.h"
 
-class CrossOverSwitch;
+struct CrossOverSwitch : public BaseSwitch {
+    virtual ~CrossOverSwitch() {
+    }
 
-using CrossOverSwitchPtr = std::shared_ptr<CrossOverSwitch>;
+    void setInNodeDiagonal(NodePtr node) {
+        inDiagonal = node;
+    }
 
-class CrossOverSwitch : public Node {
-public:
-    enum SwitchState {
-        BEND_1,
-        STRAIGHT_1,
-        BEND_2,
-        STRAIGHT_2,
-    };
+    void setInNodeVertical(NodePtr node) {
+        inVertical = node;
+    }
 
-    CrossOverSwitch(SwitchState state);
+    void setOutNodeDiagonal(NodePtr node) {
+        outDiagonal = node;
+    }
 
-    virtual ~CrossOverSwitch();
+    void setOutNodeVertical(NodePtr node) {
+        outVertical = node;
+    }
 
-    virtual NodePtr getJunctionNode(NodePtr node) const;
+    SwitchState turnSwitch() {
+        switch(currentState) {
+            case SwitchState::BEND_1:
+                return currentState = SwitchState::STRAIGHT_1;
 
-    void setInNodeDiagonal(NodePtr node);
+            case SwitchState::STRAIGHT_1:
+                return currentState = SwitchState::BEND_2;
 
-    void setInNodeVertical(NodePtr node);
+            case SwitchState::BEND_2:
+                return currentState = SwitchState::STRAIGHT_2;
 
-    void setOutNodeDiagonal(NodePtr node);
+            case SwitchState::STRAIGHT_2:
+                return currentState = SwitchState::BEND_1;
+        }
+    }
 
-    void setOutNodeVertical(NodePtr node);
+    NodePtr getJunctionNode(NodePtr node) const {
+        if(node != inDiagonal && node != inVertical && node != outDiagonal && node != outVertical) {
+            throw NodeException{"invalid node given!"};
+        }
 
-    bool turnSwitch(SwitchState state);
+        auto activeIn = getInNode();
+        auto activeOut = getOutNode();
 
-    SwitchState turnSwitch();
+        if(node == activeIn) {
+            return activeOut;
+        }
 
-    NodePtr getJunctionNode(NodePtr node);
+        if(node == activeOut) {
+            return activeIn;
+        }
 
-    NodePtr getInNode() const;
+        return NodePtr{};
+    }
 
-    NodePtr getOutNode() const;
+    NodePtr getInNode() const {
+        switch(currentState) {
+            case SwitchState::BEND_1:
+            case SwitchState::BEND_2:
+                return inDiagonal;
 
-private:
+            case SwitchState::STRAIGHT_1:
+            case SwitchState::STRAIGHT_2:
+                return inVertical;
+        }
+    }
+
+    NodePtr getOutNode() const {
+        switch(currentState) {
+            case SwitchState::BEND_1:
+            case SwitchState::STRAIGHT_1:
+                return outDiagonal;
+
+            case SwitchState::BEND_2:
+            case SwitchState::STRAIGHT_2:
+                return outVertical;
+        }
+    }
+
+protected:
     NodePtr inDiagonal;
     NodePtr inVertical;
     NodePtr outDiagonal;
     NodePtr outVertical;
-
-    SwitchState currentState;
 };
-

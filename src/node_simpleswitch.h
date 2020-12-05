@@ -20,38 +20,59 @@
 
 #pragma once
 
-#include "node.h"
+#include "node_base_switch.h"
 
-class Switch;
+struct Switch : public BaseSwitch {
 
-using SwitchPtr = std::shared_ptr<Switch>;
+    virtual ~Switch() {
+    }
 
-class Switch : public Node {
-    public:
-        enum SwitchState {
-            BEND,
-            STRAIGHT,
-        };
+    void setOutStraightNode(NodePtr node) {
+        outStraight = node;
+    }
 
-        Switch(NodePtr in, SwitchState state);
-        Switch(SwitchState state);
+    void setOutBendNode(NodePtr node) {
+        outBend = node;
+    }
 
-        virtual ~Switch();
+    void setInNode(NodePtr node) {
+        in = node;
+    }
 
-        void setOutStraightNode(NodePtr node);
+    SwitchState turnSwitch() {
+        switch(currentState) {
+            case SwitchState::BEND_1:
+            case SwitchState::BEND_2:
+                return currentState = SwitchState::STRAIGHT_1;
 
-        void setOutBendNode(NodePtr node);
+            case SwitchState::STRAIGHT_1:
+            case SwitchState::STRAIGHT_2:
+                return currentState = SwitchState::BEND_1;
+        }
+    }
 
-        bool turnSwitch(Switch::SwitchState state);
+    NodePtr getJunctionNode(NodePtr node) const {
+        if(node != in && node != outStraight && node != outBend) {
+            throw NodeException{"invalid node given!"};
+        }
+        if(node == outStraight && (currentState == SwitchState::STRAIGHT_1 || currentState == SwitchState::STRAIGHT_2)) {
+            return in;
+        }
+        if(node == outBend && (currentState == SwitchState::BEND_1 || currentState == SwitchState::BEND_2)) {
+            return in;
+        }
+        if(node == in && (currentState == SwitchState::BEND_1 || currentState == SwitchState::BEND_2)) {
+            return outBend;
+        }
+        if(node == in && (currentState == SwitchState::STRAIGHT_1 || currentState == SwitchState::STRAIGHT_2)) {
+            return outStraight;
+        }
+        return NodePtr{};
+    }
 
-        void setInNode(NodePtr node);
-
-        virtual NodePtr getJunctionNode(NodePtr node) const;
-
-    protected:
-        NodePtr in;
-        NodePtr outStraight;
-        NodePtr outBend;
-        SwitchState currentState;
+protected:
+    NodePtr in;
+    NodePtr outStraight;
+    NodePtr outBend;
 };
 
