@@ -24,40 +24,43 @@
 
 #include "node.h"
 #include "common.h"
-#include "train.h"
-#include "moba/interfacemessage.h"
 
-class Block;
+struct Block : public Node {
+    virtual ~Block() {
+    }
 
-using BlockPtr = std::shared_ptr<Block>;
+    void setOutNode(NodePtr node) {
+        out = node;
+    }
 
-class Block : public Node {
+    void setInNode(NodePtr node) {
+        in = node;
+    }
 
-    public:
-        Block(NodePtr in, ContactData contact, TrainPtr train, BlockDirection direction);
+    NodePtr getJunctionNode(NodePtr node) const {
+        //if(block == belegt) {
+            return NodePtr{};
+        //}
+        
+        if(node == in) {
+            return out;
+        }
+        if(node == out) {
+            return in;
+        }
+        throw NodeException{"invalid node given!"};
+    }
 
-        Block(NodePtr in, ContactData contact);
+    NodePtr getNode() const {
+        // Hier irgendwie mit direction arbeiten...
+        return in;
+    }
 
-        virtual ~Block();
-
-    private:
-        NodePtr in;
-        NodePtr out;
-
-        ContactData contact;
-        TrainPtr train;
+protected:
+    NodePtr in;
+    NodePtr out;
 
         BlockDirection direction;
         Direction currDirection;
-
-        void setOutNode(NodePtr node);
-
-        NodePtr getJunctionNode(NodePtr node) const;
-
-        BlockPtr getNextBlock() const;
-
-        bool pushTrain();
-
-        void moveTrain();
 };
 
