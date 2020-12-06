@@ -32,12 +32,6 @@
 using SymbolPtr = std::shared_ptr<Symbol>;
 using LayoutContainerPtr = std::shared_ptr<Container<SymbolPtr>>;
 
-enum class BlockDirection {
-    IN_TO_OUT,
-    OUT_TO_OUT,
-    BOTH
-};
-
 class DrivingDirection {
 public:
     enum DrivingDirectionEnum {
