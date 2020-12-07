@@ -27,9 +27,11 @@
 #include "node_crossoverswitch.h"
 #include "node_threewayswitch.h"
 
-void LayoutParser::fetchBlockNodes(Direction dir, Position pos, std::function<void(const NodePtr&)> fn) {
+void LayoutParser::fetchBlockNodes(Direction dir, Position pos, bool lastNodeWasBlock) {
 
-    // So lange durchlaufen bis entweder Prellbock oder Weiche gefunden worden ist.
+    auto currDir = dir;
+    auto currPos = pos;
+
     while(true) {
         pos.setNewPosition(dir);
 
@@ -37,20 +39,38 @@ void LayoutParser::fetchBlockNodes(Direction dir, Position pos, std::function<vo
         currSymbol->removeJunction(getComplementaryDirection(dir));
 
         if(currSymbol->isEnd()) {
-            if(this->lastBlock == null) {
+            if(lastNodeWasBlock == false) {
                 throw LayoutParserException{"Termination without block"};
             }
-            //this->lastBlock->setOut({});
-            return NodePtr{};
-        }
-
-        if(currSymbol->isBlockSymbol()) {
-            this->lastBlock = std::make_shared<Block>(lastBlock);
+            nodes[currPos].junctions[currDir](NodePtr{});
+            return;
         }
 
         if(currSymbol->isTrack()) {
-            currSymbol->removeJunction
             dir = currSymbol->getNextOpenJunction();
+            currSymbol->removeJunction(dir);
+
+            if(currSymbol->isBlockSymbol()) {
+
+                auto iter = nodes.find(pos);
+
+                auto tmp = nodes[pos];
+                if(iter == nodes.end()) {
+                    auto block = std::make_shared<Block>();
+                }
+
+                // FIXME: Prüfen, ob Block schon gesetzt...
+                //if()
+                tmp.node = block;
+
+                auto tmp2 = nodes[currPos];
+                tmp2.junctions[currDir](block);
+                block->setInNode(tmp2.node);
+                tmp.junctions[dir] = [block](const NodePtr &nptr) {block->setOutNode(nptr);};
+
+                currPos = pos;
+                currDir = dir;
+            }
             continue;
         }
 
@@ -110,19 +130,30 @@ NodePtr LayoutParser::parse(LayoutContainerPtr layout) {
 
     auto currSymbol = layout->get(pos);
 
-    auto dir = currSymbol->getNextOpenJunction();
+    auto dir1 = currSymbol->getNextOpenJunction();
 
-    //this->lastBlock = std::make_shared<Block>();
+    currSymbol->removeJunction(dir1);
+
+    auto tmp = nodes[pos];
+
+    auto block = std::make_shared<Block>();
+
+    tmp.node = block;
+
+    auto dir2 = currSymbol->getNextJunction();
+
+    currSymbol->removeJunction(dir2);
+
+    tmp.junctions[dir2] = [block](const NodePtr &nptr) {block->setOutNode(nptr);};
+
+    tmp.junctions[dir1] = [block](const NodePtr &nptr) {block->setInNode(nptr);};
+
+    fetchBlockNodes(dir1, pos, true);
 
 
-    this->fetchBlockNodes();
 
-
-
-
-
-
-    return tmpNode;
+    // FIXME: Prüfen, ob 2 Eingang nicht bereits schon gesetzt!
+    fetchBlockNodes(dir2, pos, true);
 }
 
 
@@ -132,7 +163,7 @@ NodePtr LayoutParser::parse(LayoutContainerPtr layout) {
 
 
 
-
+/*
 void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
 
     while(true) {
@@ -194,3 +225,4 @@ void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
     }
 }
 
+*/

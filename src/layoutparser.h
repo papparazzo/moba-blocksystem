@@ -29,6 +29,7 @@
 #include "moba/symbol.h"
 #include "moba/direction.h"
 #include "common.h"
+#include <functional>
 
 class LayoutParserException : public std::exception {
     public:
@@ -51,14 +52,18 @@ class LayoutParserException : public std::exception {
 
 class LayoutParser {
 
-    /**
-     * Der zu parsende Gleisplan
-     */
+    using NodeCallback = std::function<void(const NodePtr&)>;
+
     LayoutContainerPtr layout;
 
-    std::map<Position, NodePtr> nodes;
+    struct NodeJunctions {
+        std::map<Direction, NodeCallback> junctions;
+        NodePtr node;
+    };
 
-    void fetchBlockNodes(Direction dir, Position pos);
+    std::map<Position, NodeJunctions> nodes;
+
+    void fetchBlockNodes(Direction dir, Position pos, bool lastNodeWasBlock);
 
     void handleSwitch(Position pos);
 
