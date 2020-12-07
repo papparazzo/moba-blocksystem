@@ -32,35 +32,3 @@
 using SymbolPtr = std::shared_ptr<Symbol>;
 using LayoutContainerPtr = std::shared_ptr<Container<SymbolPtr>>;
 
-class DrivingDirection {
-public:
-    enum DrivingDirectionEnum {
-        FORWARD,
-        BACKWARD
-    };
-
-    DrivingDirection(DrivingDirectionEnum val) : value{val} {
-    }
-
-    static DrivingDirectionEnum flip(DrivingDirection d) {
-        return flip(d.value);
-    }
-
-    static DrivingDirectionEnum flip(DrivingDirectionEnum d) {
-        switch(d) {
-            case BACKWARD:
-                return FORWARD;
-
-            case FORWARD:
-                return BACKWARD;
-
-            default:
-                throw moba::common::UnsupportedOperationException{"Not supported."};
-        }
-    }
-
-protected:
-    DrivingDirectionEnum value;
-
-};
-
