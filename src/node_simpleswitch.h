@@ -22,9 +22,9 @@
 
 #include "node_base_switch.h"
 
-struct Switch : public BaseSwitch {
+struct SimpleSwitch : public BaseSwitch {
 
-    virtual ~Switch() {
+    virtual ~SimpleSwitch() {
     }
 
     void setOutStraightNode(NodePtr node) {
@@ -49,6 +49,7 @@ struct Switch : public BaseSwitch {
             case SwitchState::STRAIGHT_2:
                 return currentState = SwitchState::BEND_1;
         }
+        throw NodeException{"invalid switch state given!"};
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
