@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <moba-common/exception.h>
+
 struct DrivingDirection {
     enum DrivingDirectionEnum {
         UNKNOWN,

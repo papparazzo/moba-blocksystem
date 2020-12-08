@@ -23,7 +23,7 @@
 #include "node_base_switch.h"
 
 struct ThreeWaySwitch : public BaseSwitch {
-  
+
     virtual ~ThreeWaySwitch() {
     }
 
@@ -57,6 +57,7 @@ struct ThreeWaySwitch : public BaseSwitch {
             case SwitchState::STRAIGHT_2:
                 return currentState = SwitchState::BEND_1;
         }
+        throw NodeException{"invalid switch state given!"};
     }
 
     NodePtr getJunctionNode(NodePtr node) const {

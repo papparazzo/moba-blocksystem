@@ -56,6 +56,7 @@ struct CrossOverSwitch : public BaseSwitch {
             case SwitchState::STRAIGHT_2:
                 return currentState = SwitchState::BEND_1;
         }
+        throw NodeException{"invalid switch state given!"};
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
@@ -87,6 +88,7 @@ struct CrossOverSwitch : public BaseSwitch {
             case SwitchState::STRAIGHT_2:
                 return inVertical;
         }
+        throw NodeException{"invalid switch state given!"};
     }
 
     NodePtr getOutNode() const {
@@ -99,6 +101,7 @@ struct CrossOverSwitch : public BaseSwitch {
             case SwitchState::STRAIGHT_2:
                 return outVertical;
         }
+        throw NodeException{"invalid switch state given!"};
     }
 
 protected:
