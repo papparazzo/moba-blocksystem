@@ -23,9 +23,12 @@
 #include <memory>
 
 #include "node.h"
-#include "common.h"
+#include "driving_direction.h"
 
 struct Block : public Node {
+    Block() : blocked{false} {
+    }
+
     virtual ~Block() {
     }
 
@@ -38,10 +41,10 @@ struct Block : public Node {
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
-        //if(block == belegt) {
+        if(blocked) {
             return NodePtr{};
-        //}
-        
+        }
+
         if(node == in) {
             return out;
         }
@@ -51,8 +54,26 @@ struct Block : public Node {
         throw NodeException{"invalid node given!"};
     }
 
+    void blockIfNextNotFree(NodePtr node) {
+        NodePtr tmp;
+
+        if(node == in) {
+            tmp = out;
+        }
+        if(node == out) {
+            tmp = in;
+        }
+
+
+    }
+
     NodePtr getNode() const {
         // Hier irgendwie mit direction arbeiten...
+
+        if(direction.value == DrivingDirection::BACKWARD) {
+            return out;
+        }
+
         return in;
     }
 
@@ -60,7 +81,8 @@ protected:
     NodePtr in;
     NodePtr out;
 
-        BlockDirection direction;
-        Direction currDirection;
+    bool blocked;
+
+    DrivingDirection direction;
 };
 
