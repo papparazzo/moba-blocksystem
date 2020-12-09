@@ -22,12 +22,10 @@
 
 #include <memory>
 #include <vector>
-#include <exception>
 
 #include "moba/symbol.h"
 #include "moba/container.h"
 #include "moba/position.h"
-#include <moba-common/exception.h>
 
 using SymbolPtr = std::shared_ptr<Symbol>;
 using LayoutContainerPtr = std::shared_ptr<Container<SymbolPtr>>;
