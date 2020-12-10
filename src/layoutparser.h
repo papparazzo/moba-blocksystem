@@ -65,8 +65,6 @@ class LayoutParser {
 
     void fetchBlockNodes(Direction dir, Position pos, bool lastNodeWasBlock);
 
-    void handleSwitch(Position pos);
-
 public:
     virtual ~LayoutParser(){
     }
@@ -77,7 +75,7 @@ public:
      * @param layout zwei-dimensionales Array mit dem Gleisplan
      * @return NodePtr
      */
-    NodePtr parse(LayoutContainerPtr layout);
+    void parse(LayoutContainerPtr layout);
 };
 
 

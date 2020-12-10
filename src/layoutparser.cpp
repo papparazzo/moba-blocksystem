@@ -22,85 +22,176 @@
 #include <memory>
 
 #include "layoutparser.h"
-#include "common.h"
 #include "node_block.h"
 #include "node_crossoverswitch.h"
 #include "node_threewayswitch.h"
+#include "node_simpleswitch.h"
 
-void LayoutParser::fetchBlockNodes(Direction dir, Position pos, bool lastNodeWasBlock) {
+void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos, bool lastNodeWasBlock) {
 
-    auto currDir = dir;
-    auto currPos = pos;
+    auto startDir = curDir;
+    auto startPos = curPos;
 
     while(true) {
-        pos.setNewPosition(dir);
+        curPos.setNewPosition(curDir);
 
-        auto currSymbol = layout->get(pos);
-        currSymbol->removeJunction(getComplementaryDirection(dir));
+        auto currSymbol = layout->get(curPos);
+        auto compDir = getComplementaryDirection(curDir);
+        currSymbol->removeJunction(compDir);
 
         if(currSymbol->isEnd()) {
             if(lastNodeWasBlock == false) {
                 throw LayoutParserException{"Termination without block"};
             }
-            nodes[currPos].junctions[currDir](NodePtr{});
+            nodes[startPos].junctions[startDir](NodePtr{});
             return;
         }
 
-        if(currSymbol->isTrack()) {
-            dir = currSymbol->getNextOpenJunction();
-            currSymbol->removeJunction(dir);
+        curDir = currSymbol->getNextOpenJunction();
+        if(curDir == Direction::UNSET) {
+            return;
+        }
 
-            if(currSymbol->isBlockSymbol()) {
+        currSymbol->removeJunction(curDir);
 
-                auto iter = nodes.find(pos);
-
-                auto tmp = nodes[pos];
-                if(iter == nodes.end()) {
-                    auto block = std::make_shared<Block>();
-                }
-
-                // FIXME: Prüfen, ob Block schon gesetzt...
-                //if()
-                tmp.node = block;
-
-                auto tmp2 = nodes[currPos];
-                tmp2.junctions[currDir](block);
-                block->setInNode(tmp2.node);
-                tmp.junctions[dir] = [block](const NodePtr &nptr) {block->setOutNode(nptr);};
-
-                currPos = pos;
-                currDir = dir;
-            }
+        if(!currSymbol->isBlockSymbol() && !currSymbol->isSwitch()) {
             continue;
         }
 
-        if(currSymbol->isSwitch()) {
+        auto startNode = nodes[startPos];
 
+        auto iter = nodes.find(curPos);
+        if(iter != nodes.end()) {
+            startNode.junctions[startDir](iter->second.node);
+            iter->second.junctions[compDir](startNode.node);
+            return;
         }
+
+        lastNodeWasBlock = false;
+        auto curNode = nodes[curPos];
+
+        if(currSymbol->isBlockSymbol()) {
+            auto block = std::make_shared<Block>();
+            curNode.node = block;
+            curNode.junctions[curDir] = [block](const NodePtr &nptr) {block->setOutNode(nptr);};
+            block->setInNode(startNode.node);
+            lastNodeWasBlock = true;
+
+        } else if(currSymbol->isLeftSwitch()) {
+            auto simpleSwitch = std::make_shared<SimpleSwitch>();
+            curNode.node = simpleSwitch;
+            /*
+            if(/ *Weiche stumpf befahren? * /) {
+                curNode.junctions[curDir] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setOutNode(nptr);};
+            }else {
+                curNode.junctions[curDir] = [simpleSwitch](const NodePtr &nptr) {block->setOutNode(nptr);};
+            }
+             */
+            simpleSwitch->setInNode(startNode.node);
+        } else if(currSymbol->isRightSwitch()) {
+
+        } else if(currSymbol->isCrossOverSwitch()) {
+            // Prüfen ob DKW einen Antrieb hat!
+            auto crossOverSwitch = std::make_shared<CrossOverSwitch>();
+            auto curNode = nodes[curPos];
+            curNode.node = crossOverSwitch;
+            curNode.junctions[curDir] = [crossOverSwitch](const NodePtr &nptr) {crossOverSwitch->setInNodeDiagonal(nptr);};
+            crossOverSwitch->setInNodeDiagonal(startNode.node);
+        } else if(currSymbol->isThreeWaySwitch()) {
+            curNode.node = std::make_shared<ThreeWaySwitch>();
+        }
+
+        startNode.junctions[startDir](curNode.node);
+        startPos = curPos;
+        startDir = curDir;
     }
 }
 
-void LayoutParser::handleSwitch(Position pos) {
+void LayoutParser::parse(LayoutContainerPtr layout) {
+
+    this->layout = layout;
+
+    Position pos = layout->getNextMatchPosition([](SymbolPtr symbol) {return symbol->isBlockSymbol();});
 
     auto currSymbol = layout->get(pos);
+    auto dir1 = currSymbol->getNextOpenJunction();
+    auto dir2 = currSymbol->getNextJunction();
 
-    auto iter = nodes.find(pos);
+    currSymbol->removeJunction(dir1);
 
-    NodePtr node;
+    auto block = std::make_shared<Block>();
 
-    if(iter == nodes.end()) {
-        if(currSymbol->isCrossOverSwitch()) {
-            node = std::make_shared<CrossOverSwitch>();;
-        } else if(currSymbol->isSwitch()) {
-            node = std::make_shared<Switch>();
-        } else if(currSymbol->isThreeWaySwitch()) {
-            node = std::make_shared<ThreeWaySwitch>();
-        }
-        nodes[pos] = node;
-    } else {
-        node = *iter;
+    auto tmp = nodes[pos];
+    tmp.node = block;
+    tmp.junctions[dir2] = [block](const NodePtr &nptr) {block->setOutNode(nptr);};
+    tmp.junctions[dir1] = [block](const NodePtr &nptr) {block->setInNode(nptr);};
+
+    fetchBlockNodes(dir1, pos, true);
+
+    if(!currSymbol->isJunctionSet(dir2)) {
+        return;
     }
 
+    fetchBlockNodes(dir2, pos, true);
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+void blah() {
+
+    if(links)
+    //Direction::TOP_LEFT
+    else
+    //Direction::TOP_RIGHT
+    
+    //Direction::TOP
+    //Direction::BOTTOM
+
+
+    auto simpleSwitch = std::make_shared<SimpleSwitch>();
+
+    curNode.node = simpleSwitch;
+    curNode.junctions[curDir] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setOutStraightNode(nptr);};
+    curNode.junctions[curDir] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setOutBendNode(nptr);};
+    curNode.junctions[curDir] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setInNode(nptr);};
+
+
+
+    //Direction::TOP_LEFT
+    //Direction::TOP
+    //Direction::BOTTOM
+    //Direction::TOP_RIGHT
+
+    auto threeWaySwitch = std::make_shared<ThreeWaySwitch>();
+
+    curNode.node = threeWaySwitch;
+    curNode.junctions[curDir] = [threeWaySwitch](const NodePtr &nptr) {threeWaySwitch->setOutBendLeft(nptr);};
+    curNode.junctions[curDir] = [threeWaySwitch](const NodePtr &nptr) {threeWaySwitch->setOutBendRight(nptr);};
+    curNode.junctions[curDir] = [threeWaySwitch](const NodePtr &nptr) {threeWaySwitch->setOutStraight(nptr);};
+    curNode.junctions[curDir] = [threeWaySwitch](const NodePtr &nptr) {threeWaySwitch->setInNode(nptr);};
+
+
+}
+
+
+
+
+
+
+/*
+void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
 
 
 
@@ -120,51 +211,7 @@ void LayoutParser::handleSwitch(Position pos) {
              currSymbol->removeJunction(dir);
              continue; // einfaches Gleis -> weitermachen
      }
-}
 
-NodePtr LayoutParser::parse(LayoutContainerPtr layout) {
-
-    this->layout = layout;
-
-    Position pos = layout->getNextMatchPosition([](SymbolPtr symbol) {return symbol->isBlockSymbol();});
-
-    auto currSymbol = layout->get(pos);
-
-    auto dir1 = currSymbol->getNextOpenJunction();
-
-    currSymbol->removeJunction(dir1);
-
-    auto tmp = nodes[pos];
-
-    auto block = std::make_shared<Block>();
-
-    tmp.node = block;
-
-    auto dir2 = currSymbol->getNextJunction();
-
-    currSymbol->removeJunction(dir2);
-
-    tmp.junctions[dir2] = [block](const NodePtr &nptr) {block->setOutNode(nptr);};
-
-    tmp.junctions[dir1] = [block](const NodePtr &nptr) {block->setInNode(nptr);};
-
-    fetchBlockNodes(dir1, pos, true);
-
-
-
-    // FIXME: Prüfen, ob 2 Eingang nicht bereits schon gesetzt!
-    fetchBlockNodes(dir2, pos, true);
-}
-
-
-
-
-
-
-
-
-/*
-void LayoutParser::collectTrackPoints(Position pos, Direction dir) {
 
     while(true) {
         // Nächsten Koordinaten der Richtung
