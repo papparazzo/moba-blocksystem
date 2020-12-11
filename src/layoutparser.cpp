@@ -144,20 +144,13 @@ void LayoutParser::parse(LayoutContainerPtr layout) {
 
 
 
-}
+    Position curPos;
+    auto curNode = nodes[curPos];
+    auto offset = currSymbol->getDistance(Symbol::getLeftSwitch());
+Direction curDir;
 
+   
 
-
-
-void blah() {
-
-    if(links)
-    //Direction::TOP_LEFT
-    else
-    //Direction::TOP_RIGHT
-    
-    //Direction::TOP
-    //Direction::BOTTOM
 
 
     auto simpleSwitch = std::make_shared<SimpleSwitch>();
