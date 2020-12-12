@@ -26,20 +26,20 @@ struct CrossOverSwitch : public BaseSwitch {
     virtual ~CrossOverSwitch() {
     }
 
-    void setInNodeDiagonal(NodePtr node) {
-        inDiagonal = node;
+    void setInNodeTop(NodePtr node) {
+        inTop = node;
     }
 
-    void setInNodeVertical(NodePtr node) {
-        inVertical = node;
+    void setInNodeRight(NodePtr node) {
+        inRight = node;
     }
 
-    void setOutNodeDiagonal(NodePtr node) {
-        outDiagonal = node;
+    void setOutNodeTop(NodePtr node) {
+        outTop = node;
     }
 
-    void setOutNodeVertical(NodePtr node) {
-        outVertical = node;
+    void setOutNodeRight(NodePtr node) {
+        outRight = node;
     }
 
     SwitchState turnSwitch() {
@@ -60,7 +60,7 @@ struct CrossOverSwitch : public BaseSwitch {
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
-        if(node != inDiagonal && node != inVertical && node != outDiagonal && node != outVertical) {
+        if(node != inTop && node != inRight && node != outTop && node != outRight) {
             throw NodeException{"invalid node given!"};
         }
 
@@ -82,11 +82,11 @@ struct CrossOverSwitch : public BaseSwitch {
         switch(currentState) {
             case SwitchState::BEND_1:
             case SwitchState::BEND_2:
-                return inDiagonal;
+                return inTop;
 
             case SwitchState::STRAIGHT_1:
             case SwitchState::STRAIGHT_2:
-                return inVertical;
+                return inRight;
         }
         throw NodeException{"invalid switch state given!"};
     }
@@ -95,18 +95,18 @@ struct CrossOverSwitch : public BaseSwitch {
         switch(currentState) {
             case SwitchState::BEND_1:
             case SwitchState::STRAIGHT_1:
-                return outDiagonal;
+                return outTop;
 
             case SwitchState::BEND_2:
             case SwitchState::STRAIGHT_2:
-                return outVertical;
+                return outRight;
         }
         throw NodeException{"invalid switch state given!"};
     }
 
 protected:
-    NodePtr inDiagonal;
-    NodePtr inVertical;
-    NodePtr outDiagonal;
-    NodePtr outVertical;
+    NodePtr inTop;
+    NodePtr inRight;
+    NodePtr outTop;
+    NodePtr outRight;
 };
