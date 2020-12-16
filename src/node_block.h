@@ -24,6 +24,7 @@
 
 #include "node.h"
 #include "driving_direction.h"
+#include "moba/direction.h"
 
 struct Block : public Node {
     Block() : blocked{false} {
@@ -32,12 +33,23 @@ struct Block : public Node {
     virtual ~Block() {
     }
 
-    void setOutNode(NodePtr node) {
-        out = node;
-    }
-
-    void setInNode(NodePtr node) {
-        in = node;
+    void setJunctionNode(Direction dir, NodePtr node) {
+        switch(dir) {
+            case Direction::TOP:
+            case Direction::TOP_RIGHT:
+            case Direction::RIGHT:
+            case Direction::BOTTOM_RIGHT:
+                out = node;
+                return;
+            
+            case Direction::BOTTOM:
+            case Direction::BOTTOM_LEFT:
+            case Direction::LEFT:
+            case Direction::TOP_LEFT:
+                in = node;
+                return;
+        }
+        throw NodeException{"invalid direction given!"};
     }
 
     NodePtr getJunctionNode(NodePtr node) const {

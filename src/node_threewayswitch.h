@@ -21,26 +21,32 @@
 #pragma once
 
 #include "node_base_switch.h"
+#include "moba/direction.h"
 
 struct ThreeWaySwitch : public BaseSwitch {
 
     virtual ~ThreeWaySwitch() {
     }
 
-    void setInNode(NodePtr node) {
-        in = node;
-    }
+    void setJunctionNode(Direction dir, NodePtr node) {
+        switch(dir) {
+            case Direction::TOP:
+                outStraight = node;
+                return;
 
-    void setOutStraight(NodePtr node) {
-        outStraight = node;
-    }
+            case Direction::TOP_LEFT:
+                outBendLeft = node;
+                return;
 
-    void setOutBendLeft(NodePtr node) {
-        outBendLeft = node;
-    }
-
-    void setOutBendRight(NodePtr node) {
-        outBendRight = node;
+            case Direction::TOP_RIGHT:
+                outBendRight = node;
+                return;
+            
+            case Direction::BOTTOM:
+                in = node;
+                return;
+        }
+        throw NodeException{"invalid direction given!"};
     }
 
     SwitchState turnSwitch() {

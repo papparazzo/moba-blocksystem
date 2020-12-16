@@ -21,22 +21,29 @@
 #pragma once
 
 #include "node_base_switch.h"
+#include "moba/direction.h"
 
 struct SimpleSwitch : public BaseSwitch {
 
     virtual ~SimpleSwitch() {
     }
 
-    void setOutStraightNode(NodePtr node) {
-        outStraight = node;
-    }
+    void setJunctionNode(Direction dir, NodePtr node) {
+        switch(dir) {
+            case Direction::TOP:
+                outStraight = node;
+                return;
 
-    void setOutBendNode(NodePtr node) {
-        outBend = node;
-    }
-
-    void setInNode(NodePtr node) {
-        in = node;
+            case Direction::TOP_LEFT:
+            case Direction::TOP_RIGHT:
+                outBend = node;
+                return;
+            
+            case Direction::BOTTOM:
+                in = node;
+                return;
+        }
+        throw NodeException{"invalid direction given!"};
     }
 
     SwitchState turnSwitch() {

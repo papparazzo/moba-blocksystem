@@ -21,25 +21,31 @@
 #pragma once
 
 #include "node_base_switch.h"
+#include "moba/direction.h"
 
 struct CrossOverSwitch : public BaseSwitch {
     virtual ~CrossOverSwitch() {
     }
 
-    void setInNodeTop(NodePtr node) {
-        inTop = node;
-    }
+    void setJunctionNode(Direction dir, NodePtr node) {
+        switch(dir) {
+            case Direction::TOP:
+                outTop = node;
+                return;
 
-    void setInNodeRight(NodePtr node) {
-        inRight = node;
-    }
+            case Direction::TOP_RIGHT:
+                outRight = node;
+                return;
+            
+            case Direction::BOTTOM:
+                inBottom = node;
+                return;
 
-    void setOutNodeTop(NodePtr node) {
-        outTop = node;
-    }
-
-    void setOutNodeRight(NodePtr node) {
-        outRight = node;
+            case Direction::BOTTOM_LEFT:
+                inLeft = node;
+                return;
+        }
+        throw NodeException{"invalid direction given!"};
     }
 
     SwitchState turnSwitch() {
@@ -60,7 +66,7 @@ struct CrossOverSwitch : public BaseSwitch {
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
-        if(node != inTop && node != inRight && node != outTop && node != outRight) {
+        if(node != outTop && node != outRight && node != inBottom && node != inLeft) {
             throw NodeException{"invalid node given!"};
         }
 
@@ -82,11 +88,11 @@ struct CrossOverSwitch : public BaseSwitch {
         switch(currentState) {
             case SwitchState::BEND_1:
             case SwitchState::BEND_2:
-                return inTop;
+                return outTop;
 
             case SwitchState::STRAIGHT_1:
             case SwitchState::STRAIGHT_2:
-                return inRight;
+                return outRight;
         }
         throw NodeException{"invalid switch state given!"};
     }
@@ -95,18 +101,18 @@ struct CrossOverSwitch : public BaseSwitch {
         switch(currentState) {
             case SwitchState::BEND_1:
             case SwitchState::STRAIGHT_1:
-                return outTop;
+                return inBottom;
 
             case SwitchState::BEND_2:
             case SwitchState::STRAIGHT_2:
-                return outRight;
+                return inLeft;
         }
         throw NodeException{"invalid switch state given!"};
     }
 
 protected:
-    NodePtr inTop;
-    NodePtr inRight;
     NodePtr outTop;
     NodePtr outRight;
+    NodePtr inBottom;
+    NodePtr inLeft;
 };
