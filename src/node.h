@@ -24,6 +24,8 @@
 #include <string>
 #include <memory>
 
+#include "moba/direction.h"
+
 class NodeException : public std::exception {
 
     std::string what_;
@@ -49,4 +51,5 @@ using NodePtr = std::shared_ptr<Node>;
 struct Node {
     virtual ~Node() {};
     virtual NodePtr getJunctionNode(NodePtr node) const = 0;
+    virtual void setJunctionNode(Direction dir, NodePtr node) = 0;
 };
