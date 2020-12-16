@@ -65,14 +65,6 @@ class LayoutParser {
 
     void fetchBlockNodes(Direction dir, Position pos, bool lastNodeWasBlock);
 
-    Direction addLeftSwitch(NodeJunctions &curNode, SymbolPtr currSymbol);
-
-    Direction addRightSwitch(NodeJunctions &curNode, SymbolPtr currSymbol);
-
-    Direction addThreeWaySwitch(NodeJunctions &curNode, SymbolPtr currSymbol);
-
-    Direction addCrossOverSwitch(NodeJunctions &curNode, SymbolPtr currSymbol);
-
 public:
     virtual ~LayoutParser(){
     }

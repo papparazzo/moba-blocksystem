@@ -33,13 +33,6 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos, bool lastN
     auto startPos = curPos;
 
     while(true) {
-
-      /*  if(!currSymbol->isJunctionSet(dir2)) {
-            return;
-        }
-*/
-
-
         curPos.setNewPosition(curDir);
 
         auto curSymbol = layout->get(curPos);
@@ -62,8 +55,6 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos, bool lastN
             throw LayoutParserException{"no open junctions left"};
         }
 
-        curSymbol->removeJunction(curDir);
-
         //FIXME Prüfen ob DKW einen Antrieb hat!
         if(!curSymbol->isBlockSymbol() && !curSymbol->isSwitch() /* && !curSymbol->hasAntrieb*/) {
             continue;
@@ -75,33 +66,52 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos, bool lastN
         if(iter != nodes.end()) {
             startNode.junctions[startDir](iter->second.node);
             iter->second.junctions[compDir](startNode.node);
+            curSymbol->removeJunction(curDir);
             return;
         }
 
         lastNodeWasBlock = false;
         auto curNode = nodes[curPos];
+        NodePtr newNode;
+        Symbol sym;
 
         if(curSymbol->isBlockSymbol()) {
-            auto block = std::make_shared<Block>();
-            curNode.node = block;
-            curNode.junctions[curDir] = [block](const NodePtr &nptr) {block->setOutNode(nptr);};
-            block->setInNode(startNode.node);
+            newNode = std::make_shared<Block>();
+            sym = *curSymbol;
             lastNodeWasBlock = true;
         } else if(curSymbol->isLeftSwitch()) {
-            curDir = addLeftSwitch(curNode, curSymbol);
-
-
-
-
+            sym = Symbol{Symbol::LEFT_SWITCH};
+            newNode = std::make_shared<SimpleSwitch>();
         } else if(curSymbol->isRightSwitch()) {
-            curDir = addRightSwitch(curNode, curSymbol);
+            sym = Symbol{Symbol::RIGHT_SWITCH};
+            newNode = std::make_shared<SimpleSwitch>();
         } else if(curSymbol->isCrossOverSwitch()) {
-            curDir = addCrossOverSwitch(curNode, curSymbol);
+            sym = Symbol{Symbol::CROSS_OVER_SWITCH};
+            newNode = std::make_shared<CrossOverSwitch>();
         } else if(curSymbol->isThreeWaySwitch()) {
-            curDir = addThreeWaySwitch(curNode, curSymbol);
+            sym = Symbol{Symbol::THREE_WAY_SWITCH};
+            newNode = std::make_shared<ThreeWaySwitch>();
         }
 
+        curNode.node = newNode;
+        auto offset = curSymbol->getDistance(sym);
         startNode.junctions[startDir](curNode.node);
+
+        Direction dir;
+
+        while((dir = sym.getNextOpenJunction()) != Direction::UNSET) {
+            curNode.junctions[dir + offset] = [newNode, dir](const NodePtr &nptr) {newNode->setJunctionNode(dir, nptr);};
+            curSymbol->removeJunction(dir);
+            if(dir == compDir) {
+                curNode.junctions[compDir](startNode.node);
+                continue;
+            }
+            if(dir == curDir) {
+                continue;
+            }
+            fetchBlockNodes(dir, curPos, false);
+        }
+
         startPos = curPos;
         startDir = curDir;
     }
@@ -113,80 +123,24 @@ void LayoutParser::parse(LayoutContainerPtr layout) {
 
     Position pos = layout->getNextMatchPosition([](SymbolPtr symbol) {return symbol->isBlockSymbol();});
 
-    auto currSymbol = layout->get(pos);
-    auto dir1 = currSymbol->getNextJunction();
-    auto dir2 = currSymbol->getNextJunction(dir1);
-
-    currSymbol->removeJunction(dir1);
+    auto curSymbol = layout->get(pos);
+    auto dir1 = curSymbol->getNextJunction();
+    auto dir2 = curSymbol->getNextJunction(dir1);
 
     auto block = std::make_shared<Block>();
 
     auto tmp = nodes[pos];
     tmp.node = block;
-    tmp.junctions[dir1] = [block](const NodePtr &nptr) {block->setInNode(nptr);};
-    tmp.junctions[dir2] = [block](const NodePtr &nptr) {block->setOutNode(nptr);};
+    tmp.junctions[dir1] = [dir1, block](const NodePtr &nptr) {block->setJunctionNode(dir1, nptr);};
+    tmp.junctions[dir2] = [dir2, block](const NodePtr &nptr) {block->setJunctionNode(dir2, nptr);};
 
+    curSymbol->removeJunction(dir1);
     fetchBlockNodes(dir1, pos, true);
 
-    if(!currSymbol->isJunctionSet(dir2)) {
+    if(!curSymbol->isJunctionSet(dir2)) {
         return;
     }
+
+    curSymbol->removeJunction(dir2);
     fetchBlockNodes(dir2, pos, true);
-}
-
-Direction LayoutParser::addLeftSwitch(NodeJunctions &curNode, SymbolPtr currSymbol) {
-    auto offset = currSymbol->getDistance(Symbol{Symbol::LEFT_SWITCH});
-
-    auto simpleSwitch = std::make_shared<SimpleSwitch>();
-
-    curNode.node = simpleSwitch;
-    curNode.junctions[Direction::TOP + offset] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setOutStraightNode(nptr);};
-    curNode.junctions[Direction::TOP_LEFT + offset] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setOutBendNode(nptr);};
-    curNode.junctions[Direction::BOTTOM + offset] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setInNode(nptr);};
-
-    return Direction::TOP;
-}
-
-Direction LayoutParser::addRightSwitch(NodeJunctions &curNode, SymbolPtr currSymbol) {
-    auto offset = currSymbol->getDistance(Symbol{Symbol::RIGHT_SWITCH});
-
-    Direction curDir;
-
-    auto simpleSwitch = std::make_shared<SimpleSwitch>();
-
-    curNode.node = simpleSwitch;
-    curNode.junctions[Direction::TOP + offset] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setOutStraightNode(nptr);};
-    curNode.junctions[Direction::TOP_RIGHT+ offset] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setOutBendNode(nptr);};
-    curNode.junctions[Direction::BOTTOM + offset] = [simpleSwitch](const NodePtr &nptr) {simpleSwitch->setInNode(nptr);};
-    return curDir;
-}
-
-Direction LayoutParser::addThreeWaySwitch(NodeJunctions &curNode, SymbolPtr currSymbol) {
-    auto offset = currSymbol->getDistance(Symbol{Symbol::THREE_WAY_SWITCH});
-
-    Direction curDir;
-
-    auto threeWaySwitch = std::make_shared<ThreeWaySwitch>();
-
-    curNode.node = threeWaySwitch;
-    curNode.junctions[Direction::TOP_LEFT + offset] = [threeWaySwitch](const NodePtr &nptr) {threeWaySwitch->setOutBendLeft(nptr);};
-    curNode.junctions[Direction::TOP_RIGHT + offset] = [threeWaySwitch](const NodePtr &nptr) {threeWaySwitch->setOutBendRight(nptr);};
-    curNode.junctions[Direction::TOP + offset] = [threeWaySwitch](const NodePtr &nptr) {threeWaySwitch->setOutStraight(nptr);};
-    curNode.junctions[Direction::BOTTOM + offset] = [threeWaySwitch](const NodePtr &nptr) {threeWaySwitch->setInNode(nptr);};
-    return curDir;
-}
-
-Direction LayoutParser::addCrossOverSwitch(NodeJunctions &curNode, SymbolPtr currSymbol) {
-    auto offset = currSymbol->getDistance(Symbol{Symbol::CROSS_OVER_SWITCH});
-
-    Direction curDir;
-
-    auto crossOverSwitch = std::make_shared<CrossOverSwitch>();
-
-    curNode.node = crossOverSwitch;
-    curNode.junctions[Direction::TOP + offset] = [crossOverSwitch](const NodePtr &nptr) {crossOverSwitch->setInNodeTop(nptr);};
-    curNode.junctions[Direction::BOTTOM + offset] = [crossOverSwitch](const NodePtr &nptr) {crossOverSwitch->setOutNodeTop(nptr);};
-    curNode.junctions[Direction::TOP_RIGHT + offset] = [crossOverSwitch](const NodePtr &nptr) {crossOverSwitch->setInNodeRight(nptr);};
-    curNode.junctions[Direction::BOTTOM_LEFT + offset] = [crossOverSwitch](const NodePtr &nptr) {crossOverSwitch->setOutNodeRight(nptr);};
-    return curDir;
 }
