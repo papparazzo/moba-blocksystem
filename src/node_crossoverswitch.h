@@ -36,7 +36,7 @@ struct CrossOverSwitch : public BaseSwitch {
             case Direction::TOP_RIGHT:
                 outRight = node;
                 return;
-            
+
             case Direction::BOTTOM:
                 inBottom = node;
                 return;
@@ -48,19 +48,19 @@ struct CrossOverSwitch : public BaseSwitch {
         throw NodeException{"invalid direction given!"};
     }
 
-    SwitchState turnSwitch() {
+    SwitchStand turnSwitch() {
         switch(currentState) {
-            case SwitchState::BEND_1:
-                return currentState = SwitchState::STRAIGHT_1;
+            case SwitchStand::BEND_1:
+                return currentState = SwitchStand::STRAIGHT_1;
 
-            case SwitchState::STRAIGHT_1:
-                return currentState = SwitchState::BEND_2;
+            case SwitchStand::STRAIGHT_1:
+                return currentState = SwitchStand::BEND_2;
 
-            case SwitchState::BEND_2:
-                return currentState = SwitchState::STRAIGHT_2;
+            case SwitchStand::BEND_2:
+                return currentState = SwitchStand::STRAIGHT_2;
 
-            case SwitchState::STRAIGHT_2:
-                return currentState = SwitchState::BEND_1;
+            case SwitchStand::STRAIGHT_2:
+                return currentState = SwitchStand::BEND_1;
         }
         throw NodeException{"invalid switch state given!"};
     }
@@ -86,12 +86,12 @@ struct CrossOverSwitch : public BaseSwitch {
 
     NodePtr getInNode() const {
         switch(currentState) {
-            case SwitchState::BEND_1:
-            case SwitchState::BEND_2:
+            case SwitchStand::BEND_1:
+            case SwitchStand::BEND_2:
                 return outTop;
 
-            case SwitchState::STRAIGHT_1:
-            case SwitchState::STRAIGHT_2:
+            case SwitchStand::STRAIGHT_1:
+            case SwitchStand::STRAIGHT_2:
                 return outRight;
         }
         throw NodeException{"invalid switch state given!"};
@@ -99,12 +99,12 @@ struct CrossOverSwitch : public BaseSwitch {
 
     NodePtr getOutNode() const {
         switch(currentState) {
-            case SwitchState::BEND_1:
-            case SwitchState::STRAIGHT_1:
+            case SwitchStand::BEND_1:
+            case SwitchStand::STRAIGHT_1:
                 return inBottom;
 
-            case SwitchState::BEND_2:
-            case SwitchState::STRAIGHT_2:
+            case SwitchStand::BEND_2:
+            case SwitchStand::STRAIGHT_2:
                 return inLeft;
         }
         throw NodeException{"invalid switch state given!"};

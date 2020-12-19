@@ -21,23 +21,18 @@
 #pragma once
 
 #include "node.h"
+#include "moba/switchstand.h"
 
 struct BaseSwitch : public Node {
-    enum class SwitchState {
-        BEND_1,
-        STRAIGHT_1,
-        BEND_2,
-        STRAIGHT_2,
-    };
 
-    virtual void setSwitch(SwitchState state) {
+    virtual void setSwitch(SwitchStand state) {
         currentState = state;
     }
 
-    virtual SwitchState turnSwitch() = 0;
+    virtual SwitchStand turnSwitch() = 0;
 
     virtual ~BaseSwitch() {};
 
 protected:
-    SwitchState currentState;
+    SwitchStand currentState;
 };

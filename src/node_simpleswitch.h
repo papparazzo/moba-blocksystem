@@ -38,7 +38,7 @@ struct SimpleSwitch : public BaseSwitch {
             case Direction::TOP_RIGHT:
                 outBend = node;
                 return;
-            
+
             case Direction::BOTTOM:
                 in = node;
                 return;
@@ -46,15 +46,15 @@ struct SimpleSwitch : public BaseSwitch {
         throw NodeException{"invalid direction given!"};
     }
 
-    SwitchState turnSwitch() {
+    SwitchStand turnSwitch() {
         switch(currentState) {
-            case SwitchState::BEND_1:
-            case SwitchState::BEND_2:
-                return currentState = SwitchState::STRAIGHT_1;
+            case SwitchStand::BEND_1:
+            case SwitchStand::BEND_2:
+                return currentState = SwitchStand::STRAIGHT_1;
 
-            case SwitchState::STRAIGHT_1:
-            case SwitchState::STRAIGHT_2:
-                return currentState = SwitchState::BEND_1;
+            case SwitchStand::STRAIGHT_1:
+            case SwitchStand::STRAIGHT_2:
+                return currentState = SwitchStand::BEND_1;
         }
         throw NodeException{"invalid switch state given!"};
     }
@@ -63,16 +63,16 @@ struct SimpleSwitch : public BaseSwitch {
         if(node != in && node != outStraight && node != outBend) {
             throw NodeException{"invalid node given!"};
         }
-        if(node == outStraight && (currentState == SwitchState::STRAIGHT_1 || currentState == SwitchState::STRAIGHT_2)) {
+        if(node == outStraight && (currentState == SwitchStand::STRAIGHT_1 || currentState == SwitchStand::STRAIGHT_2)) {
             return in;
         }
-        if(node == outBend && (currentState == SwitchState::BEND_1 || currentState == SwitchState::BEND_2)) {
+        if(node == outBend && (currentState == SwitchStand::BEND_1 || currentState == SwitchStand::BEND_2)) {
             return in;
         }
-        if(node == in && (currentState == SwitchState::BEND_1 || currentState == SwitchState::BEND_2)) {
+        if(node == in && (currentState == SwitchStand::BEND_1 || currentState == SwitchStand::BEND_2)) {
             return outBend;
         }
-        if(node == in && (currentState == SwitchState::STRAIGHT_1 || currentState == SwitchState::STRAIGHT_2)) {
+        if(node == in && (currentState == SwitchStand::STRAIGHT_1 || currentState == SwitchStand::STRAIGHT_2)) {
             return outStraight;
         }
         return NodePtr{};
