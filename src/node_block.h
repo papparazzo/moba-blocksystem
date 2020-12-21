@@ -41,7 +41,7 @@ struct Block : public Node {
             case Direction::BOTTOM_RIGHT:
                 out = node;
                 return;
-            
+
             case Direction::BOTTOM:
             case Direction::BOTTOM_LEFT:
             case Direction::LEFT:
@@ -75,8 +75,6 @@ struct Block : public Node {
         if(node == out) {
             tmp = in;
         }
-
-
     }
 
     NodePtr getNode() const {
