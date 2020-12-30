@@ -25,6 +25,8 @@
 
 struct ThreeWaySwitch : public BaseSwitch {
 
+    using BaseSwitch::BaseSwitch;
+
     virtual ~ThreeWaySwitch() {
     }
 

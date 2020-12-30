@@ -25,8 +25,7 @@
 
 struct BaseSwitch : public Node {
 
-    virtual void setSwitch(SwitchStand state) {
-        currentState = state;
+    BaseSwitch(SwitchStand switchStand) : currentState{switchStand} {
     }
 
     virtual SwitchStand turnSwitch() = 0;

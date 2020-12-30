@@ -24,6 +24,9 @@
 #include "moba/direction.h"
 
 struct CrossOverSwitch : public BaseSwitch {
+
+    using BaseSwitch::BaseSwitch;
+
     virtual ~CrossOverSwitch() {
     }
 

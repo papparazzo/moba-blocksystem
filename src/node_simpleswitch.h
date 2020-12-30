@@ -25,6 +25,8 @@
 
 struct SimpleSwitch : public BaseSwitch {
 
+    using BaseSwitch::BaseSwitch;
+
     virtual ~SimpleSwitch() {
     }
 
