@@ -29,7 +29,7 @@
 
 #include "moba/socket.h"
 #include "moba/endpoint.h"
-#include "moba/layouthandler.h"
+#include "moba/layoutmessages.h"
 #include "msgloop.h"
 
 #include <unistd.h>
