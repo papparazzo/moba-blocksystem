@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "common.h"
+#include "driving_direction.h"
 
 class Train {
 public:
