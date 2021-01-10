@@ -23,11 +23,16 @@
 #include <memory>
 
 #include "node.h"
-#include "driving_direction.h"
+#include "moba/driving_direction.h"
 #include "moba/direction.h"
+#include "moba/train.h"
 
 struct Block : public Node {
-    Block() : blocked{false} {
+
+    Block() {
+    }
+
+    Block(TrainPtr train) : train{train} {
     }
 
     virtual ~Block() {
@@ -53,10 +58,20 @@ struct Block : public Node {
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
-        if(blocked) {
+       // if(train) {
             return NodePtr{};
-        }
+       // }
 
+        if(currentState == SwitchStand::BEND_1) {
+
+        }
+/*
+        switch(currentState) {
+            case
+            case SwitchStand::BEND_2:
+                return NodePtr{};
+        }
+*/
         if(node == in) {
             return out;
         }
@@ -66,23 +81,12 @@ struct Block : public Node {
         throw NodeException{"invalid node given!"};
     }
 
-    void blockIfNextNotFree(NodePtr node) {
-        NodePtr tmp;
-
-        if(node == in) {
-            tmp = out;
-        }
-        if(node == out) {
-            tmp = in;
-        }
-    }
-
     NodePtr getNode() const {
         // Hier irgendwie mit direction arbeiten...
 
-        if(direction.value == DrivingDirection::BACKWARD) {
-            return out;
-        }
+        //if(direction.value == DrivingDirection::BACKWARD) {
+        //    return out;
+        //}
 
         return in;
     }
@@ -91,8 +95,7 @@ protected:
     NodePtr in;
     NodePtr out;
 
-    bool blocked;
+    TrainPtr train;
 
-    DrivingDirection direction;
 };
 

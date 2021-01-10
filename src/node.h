@@ -25,6 +25,7 @@
 #include <memory>
 
 #include "moba/direction.h"
+#include "moba/switchstand.h"
 
 class NodeException : public std::exception {
 
@@ -49,7 +50,18 @@ struct Node;
 using NodePtr = std::shared_ptr<Node>;
 
 struct Node {
+    Node(SwitchStand switchStand = SwitchStand::STRAIGHT_1) : currentState{switchStand} {
+    }
+
     virtual ~Node() {};
     virtual NodePtr getJunctionNode(NodePtr node) const = 0;
     virtual void setJunctionNode(Direction dir, NodePtr node) = 0;
+
+    void turn(SwitchStand stand) {
+        currentState = stand;
+    }
+
+protected:
+    SwitchStand currentState;
+
 };

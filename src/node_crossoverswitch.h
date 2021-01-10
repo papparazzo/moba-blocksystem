@@ -20,12 +20,12 @@
 
 #pragma once
 
-#include "node_base_switch.h"
+#include "node.h"
 #include "moba/direction.h"
 
-struct CrossOverSwitch : public BaseSwitch {
+struct CrossOverSwitch : public Node {
 
-    using BaseSwitch::BaseSwitch;
+    using Node::Node;
 
     virtual ~CrossOverSwitch() {
     }
@@ -49,23 +49,6 @@ struct CrossOverSwitch : public BaseSwitch {
                 return;
         }
         throw NodeException{"invalid direction given!"};
-    }
-
-    SwitchStand turnSwitch() {
-        switch(currentState) {
-            case SwitchStand::BEND_1:
-                return currentState = SwitchStand::STRAIGHT_1;
-
-            case SwitchStand::STRAIGHT_1:
-                return currentState = SwitchStand::BEND_2;
-
-            case SwitchStand::BEND_2:
-                return currentState = SwitchStand::STRAIGHT_2;
-
-            case SwitchStand::STRAIGHT_2:
-                return currentState = SwitchStand::BEND_1;
-        }
-        throw NodeException{"invalid switch state given!"};
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
