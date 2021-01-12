@@ -28,6 +28,7 @@
 #include "moba/container.h"
 #include "moba/symbol.h"
 #include "moba/direction.h"
+#include "moba/shared.h"
 #include "common.h"
 #include <functional>
 
@@ -54,7 +55,14 @@ class LayoutParser {
 
     using NodeCallback = std::function<void(const NodePtr&)>;
 
+    // In
     LayoutContainerPtr layout;
+    BlockContactDataMapPtr blockContacts;
+    SwitchStandMapPtr switchstates;
+
+    // Out
+    SwitchNodeMapPtr switches;
+    BlockNodeMapPtr blocks;
 
     struct NodeJunctions {
         std::map<Direction, NodeCallback> junctions;
@@ -63,19 +71,26 @@ class LayoutParser {
 
     std::map<Position, NodeJunctions> nodes;
 
-    void fetchBlockNodes(Direction dir, Position pos, bool lastNodeWasBlock);
+    void fetchBlockNodes(Direction dir, Position pos);
 
 public:
+    LayoutParser() {
+        switches = std::make_shared<std::map<int, std::shared_ptr<Node>>>();
+        blocks = std::make_shared<std::map<ContactData, std::shared_ptr<Block>>>();
+    }
+
     virtual ~LayoutParser(){
     }
 
-    /**
-     * Parst einen gesamten Gleisplan und liefert einen Baum zurück
-     *
-     * @param layout zwei-dimensionales Array mit dem Gleisplan
-     * @return NodePtr
-     */
-    void parse(LayoutContainerPtr layout);
+    void parse(LayoutContainerPtr layout, BlockContactDataMapPtr blockContacts, SwitchStandMapPtr switchstates);
+
+    SwitchNodeMapPtr getSwitchMap() {
+        return switches;
+    }
+
+    BlockNodeMapPtr getBlockMap() {
+        return blocks;
+    }
 };
 
 
