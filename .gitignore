@@ -66,6 +66,7 @@ Makefile.in
 /response.log
 /src/.deps/
 /core
+/src/core
 
 # misc
 
