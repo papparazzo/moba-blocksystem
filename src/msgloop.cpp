@@ -25,34 +25,71 @@
 #include "moba/registry.h"
 #include "layoutparser.h"
 
-MessageLoop::MessageLoop(EndpointPtr endpoint) : endpoint{endpoint} {
+MessageLoop::MessageLoop(EndpointPtr endpoint) : endpoint{endpoint}, closing{false} {
 }
 
 void MessageLoop::run() {
     while(!closing) {
-        try {
-            endpoint->connect();
-            endpoint->sendMsg(LayoutGetLayoutReadOnlyReq{});
-
+        //try {
             Registry registry;
             registry.registerHandler<GetLayout>([this](const GetLayout &d){parseLayout(d);});
             registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d){contactTriggered(d);});
+            registry.registerHandler<GetBlockingContacts>([this](const GetBlockingContacts &d){getFeedbackContactList(d);});
+            registry.registerHandler<GetSwitchStates>([this](const GetSwitchStates &d) {getSwitchStates(d);});
+
+            endpoint->connect();
+            endpoint->sendMsg(ControlGetContactListReq{});
 
             while(true) {
                 registry.handleMsg(endpoint->waitForNewMsg());
             }
-        } catch(const std::exception &e) {
-            LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
-        }
+        //} catch(const std::exception &e) {
+        //    LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
+        //}
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
 }
 
+void MessageLoop::getFeedbackContactList(const GetBlockingContacts &d) {
+    blockContacts = d.blockContacts;
+    endpoint->sendMsg(ControlGetSwitchStateListReq{});
+}
+
+void MessageLoop::getSwitchStates(const GetSwitchStates &d) {
+    switchstates = d.switchstates;
+    endpoint->sendMsg(LayoutGetLayoutReadOnlyReq{});
+}
+
 void MessageLoop::parseLayout(const MessageLoop::GetLayout &d) {
     LayoutParser parser;
-    parser.parse(d.symbols);
+    parser.parse(d.symbols, blockContacts, switchstates);
+
+    auto blockMap = parser.getBlockMap();
+    auto switchMap = parser.getSwitchMap();
+
+    auto i = 0;
+
+    std::cerr << "blockMap: " <<  blockMap->size() << std::endl;
+    std::cerr << "switchMap: " << switchMap->size() << std::endl;
+
+    for(auto &iter : *blockMap) {
+        std::cerr << "#" << i++ << " >> " << iter.first.modulAddr << ":" << iter.first.contactNb << " >> " << std::endl;
+    }
+
+
+
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
+   // d.contactTrigger.
+}
 
+void doit() {
+    BlockNodeMapPtr blockNode;
+
+    //for(auto &iter : *blockNode) {
+
+
+       // (*trainList)[iter["id"].GetInt()] = std::make_shared<Train>(iter);
+    //}
 }

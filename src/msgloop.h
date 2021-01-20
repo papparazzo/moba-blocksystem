@@ -22,8 +22,9 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "moba/layouthandler.h"
-#include "moba/interfacemessage.h"
+#include "moba/layoutmessages.h"
+#include "moba/interfacemessages.h"
+#include "moba/controlmessages.h"
 #include "moba/endpoint.h"
 #include <memory>
 #include "common.h"
@@ -34,7 +35,7 @@ class MessageLoop : private boost::noncopyable {
         static constexpr std::uint32_t MESSAGE_ID = LAYOUT_GET_LAYOUT_RES;
 
         GetLayout(const rapidjson::Document &d) {
-            symbols = std::make_shared<Container<std::shared_ptr<Symbol>>>();
+            symbols = std::make_shared<Container<SymbolPtr>>();
             for(auto &iter : d["symbols"].GetArray()) {
                 symbols->addItem(
                     {
@@ -49,11 +50,51 @@ class MessageLoop : private boost::noncopyable {
         LayoutContainerPtr symbols;
     };
 
+    struct GetBlockingContacts : public ControlMessage {
+        static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_CONTACT_LIST_RES;
+
+        GetBlockingContacts(const rapidjson::Document &d) {
+            blockContacts = std::make_shared<std::map<Position, BlockContactDataPtr>>();
+
+            for(auto &iter : d.GetArray()) {
+                (*blockContacts)[{
+                    static_cast<std::size_t>(iter["xPos"].GetInt()),
+                    static_cast<std::size_t>(iter["yPos"].GetInt())
+                }] = std::make_shared<BlockContactData>(iter);
+            }
+        }
+
+        BlockContactDataMapPtr blockContacts;
+    };
+
+    struct GetSwitchStates : public ControlMessage {
+        static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_SWITCH_STAND_LIST_RES;
+        GetSwitchStates(const rapidjson::Document &d) {
+            switchstates = std::make_shared<std::map<Position, SwitchStandData>>();
+
+            for(auto &iter : d.GetArray()) {
+                (*switchstates)[{
+                    static_cast<std::size_t>(iter["xPos"].GetInt()),
+                    static_cast<std::size_t>(iter["yPos"].GetInt())
+                }] = SwitchStandData{iter};
+            }
+        }
+
+        SwitchStandMapPtr switchstates;
+    };
+
     EndpointPtr endpoint;
+
+    BlockContactDataMapPtr blockContacts;
+    SwitchStandMapPtr switchstates;
+    BlockNodeMapPtr blockMap;
+
     bool closing;
 
     void parseLayout(const GetLayout &d);
     void contactTriggered(const InterfaceContactTriggered &d);
+    void getFeedbackContactList(const GetBlockingContacts &d);
+    void getSwitchStates(const GetSwitchStates &d);
 
 public:
     MessageLoop(EndpointPtr endpoint);
