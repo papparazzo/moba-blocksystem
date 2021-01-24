@@ -29,19 +29,11 @@
 #include "moba/shared.h"
 
 void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
-
-    static int i = 0;
-    static int a = 0;
-
     auto startDir = curDir;
     auto startPos = curPos;
 
-//std::cout << "a: " << ++a << " startDir: " << startDir << " startPos: " << startPos << std::endl;
-
     while(true) {
         curPos.setNewPosition(curDir);
-
-//std::cout << " #" << ++i << " -> " << curPos << " - " << curDir << std::endl;
 
         auto curSymbol = layout->get(curPos);
         auto compDir = curDir.getComplementaryDirection();
@@ -60,10 +52,6 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
             curDir = curSymbol->getNextOpenJunction();
         }
 
-        if(curDir == Direction::UNSET) {
-            throw LayoutParserException{"no open junctions left"};
-        }
-
         //FIXME Prüfen ob DKW einen Antrieb hat!
         auto block = blockContacts->find(curPos);
         if(block == blockContacts->end() && !curSymbol->isSwitch() /* && !curSymbol->hasAntrieb*/) {
@@ -76,7 +64,6 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         auto iter = nodes.find(curPos);
         if(iter != nodes.end()) {
             startNode.junctions[startDir](iter->second.node);
-//std::cerr << "found!" << compDir << std::endl;
             iter->second.junctions[compDir](startNode.node);
             curSymbol->removeJunction(curDir);
             return;
@@ -98,7 +85,7 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
             sym = *curSymbol;
             sym.reset();
 
-            (*blocks)[block->second->id] = bNode;
+            (*blocks)[block->second->blockContact] = bNode;
             newNode = bNode;
         } else if(curSymbol->isLeftSwitch()) {
             sym = Symbol{Symbol::LEFT_SWITCH};
@@ -121,14 +108,11 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         curNode.node = newNode;
         auto offset = curSymbol->getDistance(sym);
 
-//std::cout << "offset: " << (int)offset << std::endl;
-
         startNode.junctions[startDir](curNode.node);
 
         Direction dir;
 
         while((dir = sym.getNextOpenJunction()) != Direction::UNSET) {
-//std::cout << "while dir " << dir << std::endl;
             curNode.junctions[dir + offset] = [newNode, dir](const NodePtr &nptr) {newNode->setJunctionNode(dir, nptr);};
             sym.removeJunction(dir);
         }
@@ -138,7 +122,6 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         while((dir = sym.getNextOpenJunction()) != Direction::UNSET) {
             sym.removeJunction(dir);
             if(dir + offset == compDir) {
-//std::cout << "is comp: " << compDir << std::endl;
                 curNode.junctions[compDir](startNode.node);
                 continue;
             }
