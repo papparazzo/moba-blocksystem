@@ -69,15 +69,9 @@ void MessageLoop::parseLayout(const MessageLoop::GetLayout &d) {
 
     auto i = 0;
 
-    std::cerr << "blockMap: " <<  blockMap->size() << std::endl;
-    std::cerr << "switchMap: " << switchMap->size() << std::endl;
-
-    for(auto &iter : *blockMap) {
-        std::cerr << "#" << i++ << " >> " << iter.first.modulAddr << ":" << iter.first.contactNb << " >> " << std::endl;
+    for (const auto& [key, value] : *blockMap) {
+        screen.drawBlock(i++, key, value);
     }
-
-
-
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {

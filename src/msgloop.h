@@ -21,13 +21,14 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
+#include <memory>
 
 #include "moba/layoutmessages.h"
 #include "moba/interfacemessages.h"
 #include "moba/controlmessages.h"
 #include "moba/endpoint.h"
-#include <memory>
 #include "common.h"
+#include "screen.h"
 
 class MessageLoop : private boost::noncopyable {
 
@@ -42,7 +43,7 @@ class MessageLoop : private boost::noncopyable {
                         static_cast<std::size_t>(iter["xPos"].GetInt()),
                         static_cast<std::size_t>(iter["yPos"].GetInt())
                     },
-                    std::make_shared<Symbol>(iter["symbol"].GetInt())
+                    std::make_shared<LayoutSymbol>(iter["id"].GetInt(), iter["symbol"].GetInt())
                 );
             }
         }
@@ -88,6 +89,8 @@ class MessageLoop : private boost::noncopyable {
     BlockContactDataMapPtr blockContacts;
     SwitchStandMapPtr switchstates;
     BlockNodeMapPtr blockMap;
+
+    Screen screen;
 
     bool closing;
 
