@@ -5,10 +5,11 @@ bin_PROGRAMS = \
 moba_blocksystem_SOURCES = \
     layoutparser.cpp \
     main.cpp \
-    msgloop.cpp
+    msgloop.cpp \
+    screen.cpp
 
 moba_blocksystem_LDADD = \
-    -lmobacommon $(GTKMM_LIBS) \
+    -lmobacommon -lncurses $(GTKMM_LIBS) \
     $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a \
     $(srcdir)/../modules/lib-tracklayout/src/moba/libtracklayout.a
 
@@ -18,6 +19,6 @@ AM_CPPFLAGS = \
     $(GTKMM_CFLAGS) \
     -I$(srcdir)/../modules/lib-msghandling/src \
     -I$(srcdir)/../modules/lib-tracklayout/src \
-    -g3 -g -ggdb -O3 -Wall
+    -g3 -g -ggdb  -Wall
 
 CLEANFILES = *~
