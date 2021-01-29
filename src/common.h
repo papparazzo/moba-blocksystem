@@ -22,11 +22,30 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 
+#include "moba/train.h"
 #include "moba/symbol.h"
 #include "moba/container.h"
 #include "moba/position.h"
+#include "moba/shared.h"
+#include "node.h"
+#include "node_block.h"
 
-using SymbolPtr = std::shared_ptr<Symbol>;
+// In
+struct LayoutSymbol {
+    LayoutSymbol(int id, Symbol symbol): id{id}, symbol{symbol} {
+    }
+	int id;
+	Symbol symbol;
+};
+
+using SymbolPtr = std::shared_ptr<LayoutSymbol>;
 using LayoutContainerPtr = std::shared_ptr<Container<SymbolPtr>>;
+using BlockContactDataPtr = std::shared_ptr<BlockContactData>;
+using BlockContactDataMapPtr = std::shared_ptr<std::map<Position, BlockContactDataPtr>>;
+using SwitchStandMapPtr = std::shared_ptr<std::map<Position, SwitchStandData>>;
 
+// Out
+using SwitchNodeMapPtr = std::shared_ptr<std::map<int, NodePtr>>;
+using BlockNodeMapPtr = std::shared_ptr<std::map<ContactData, BlockPtr>>;

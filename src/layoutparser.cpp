@@ -38,24 +38,24 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         auto curSymbol = layout->get(curPos);
         auto compDir = curDir.getComplementaryDirection();
 
-        if(!curSymbol->isJunctionSet(compDir)) {
+        if(!curSymbol->symbol.isJunctionSet(compDir)) {
             return;
         }
 
-        curSymbol->removeJunction(compDir);
+        curSymbol->symbol.removeJunction(compDir);
 
-        if(curSymbol->isEnd()) {
+        if(curSymbol->symbol.isEnd()) {
             return;
         }
 
-        if(!curSymbol->isCrossOver() && !curSymbol->isCrossOverSwitch()) {
-            curDir = curSymbol->getNextOpenJunction();
+        if(!curSymbol->symbol.isCrossOver() && !curSymbol->symbol.isCrossOverSwitch()) {
+            curDir = curSymbol->symbol.getNextOpenJunction();
         }
 
         //FIXME Prüfen ob DKW einen Antrieb hat!
         auto block = blockContacts->find(curPos);
-        if(block == blockContacts->end() && !curSymbol->isSwitch() /* && !curSymbol->hasAntrieb*/) {
-            curSymbol->removeJunction(curDir);
+        if(block == blockContacts->end() && !curSymbol->symbol.isSwitch() /* && !curSymbol->hasAntrieb*/) {
+            curSymbol->symbol.removeJunction(curDir);
             continue;
         }
 
@@ -65,7 +65,7 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         if(iter != nodes.end()) {
             startNode.junctions[startDir](iter->second.node);
             iter->second.junctions[compDir](startNode.node);
-            curSymbol->removeJunction(curDir);
+            curSymbol->symbol.removeJunction(curDir);
             return;
         }
 
@@ -81,24 +81,23 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         }
 
         if(block != blockContacts->end()) {
-            auto bNode = std::make_shared<Block>();
-            sym = *curSymbol;
+            auto bNode = std::make_shared<Block>(curSymbol->id);
+            sym = curSymbol->symbol;
             sym.reset();
-
             (*blocks)[block->second->blockContact] = bNode;
             newNode = bNode;
-        } else if(curSymbol->isLeftSwitch()) {
+        } else if(curSymbol->symbol.isLeftSwitch()) {
             sym = Symbol{Symbol::LEFT_SWITCH};
-            newNode = std::make_shared<SimpleSwitch>(stand);
-        } else if(curSymbol->isRightSwitch()) {
+            newNode = std::make_shared<SimpleSwitch>(curSymbol->id, stand);
+        } else if(curSymbol->symbol.isRightSwitch()) {
             sym = Symbol{Symbol::RIGHT_SWITCH};
-            newNode = std::make_shared<SimpleSwitch>(stand);
-        } else if(curSymbol->isCrossOverSwitch()) {
+            newNode = std::make_shared<SimpleSwitch>(curSymbol->id, stand);
+        } else if(curSymbol->symbol.isCrossOverSwitch()) {
             sym = Symbol{Symbol::CROSS_OVER_SWITCH};
-            newNode = std::make_shared<CrossOverSwitch>(stand);
-        } else if(curSymbol->isThreeWaySwitch()) {
+            newNode = std::make_shared<CrossOverSwitch>(curSymbol->id, stand);
+        } else if(curSymbol->symbol.isThreeWaySwitch()) {
             sym = Symbol{Symbol::THREE_WAY_SWITCH};
-            newNode = std::make_shared<ThreeWaySwitch>(stand);
+            newNode = std::make_shared<ThreeWaySwitch>(curSymbol->id, stand);
         }
 
         if(iters != switchstates->end()) {
@@ -106,7 +105,7 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         }
 
         curNode.node = newNode;
-        auto offset = curSymbol->getDistance(sym);
+        auto offset = curSymbol->symbol.getDistance(sym);
 
         startNode.junctions[startDir](curNode.node);
 
@@ -125,7 +124,7 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
                 curNode.junctions[compDir](startNode.node);
                 continue;
             }
-            curSymbol->removeJunction(dir + offset);
+            curSymbol->symbol.removeJunction(dir + offset);
             fetchBlockNodes(dir + offset, curPos);
         }
         return;
@@ -146,25 +145,25 @@ void LayoutParser::parse(LayoutContainerPtr layout, BlockContactDataMapPtr block
     Position pos = firstBlock->first;
 
     auto curSymbol = layout->get(pos);
-    auto dir1 = curSymbol->getNextJunction();
-    auto dir2 = curSymbol->getNextJunction(dir1);
+    auto dir1 = curSymbol->symbol.getNextJunction();
+    auto dir2 = curSymbol->symbol.getNextJunction(dir1);
 
-    auto block = std::make_shared<Block>();
+    auto block = std::make_shared<Block>(curSymbol->id);
     auto &tmp = nodes[pos];
 
-    (*blocks)[firstBlock->second->id] = block;
+    (*blocks)[firstBlock->second->blockContact] = block;
 
     tmp.node = block;
     tmp.junctions[dir1] = [dir1, block](const NodePtr &nptr) {block->setJunctionNode(dir1, nptr);};
     tmp.junctions[dir2] = [dir2, block](const NodePtr &nptr) {block->setJunctionNode(dir2, nptr);};
 
-    curSymbol->removeJunction(dir1);
+    curSymbol->symbol.removeJunction(dir1);
     fetchBlockNodes(dir1, pos);
 
-    if(!curSymbol->isJunctionSet(dir2)) {
+    if(!curSymbol->symbol.isJunctionSet(dir2)) {
         return;
     }
 
-    curSymbol->removeJunction(dir2);
+    curSymbol->symbol.removeJunction(dir2);
     fetchBlockNodes(dir2, pos);
 }
