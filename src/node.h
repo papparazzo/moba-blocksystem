@@ -50,7 +50,7 @@ struct Node;
 using NodePtr = std::shared_ptr<Node>;
 
 struct Node {
-    Node(SwitchStand switchStand = SwitchStand::STRAIGHT_1) : currentState{switchStand} {
+    Node(unsigned int id, SwitchStand switchStand = SwitchStand::STRAIGHT_1) : id{id}, currentState{switchStand} {
     }
 
     virtual ~Node() {};
@@ -61,7 +61,12 @@ struct Node {
         currentState = stand;
     }
 
+    unsigned int getId() const {
+        return id;
+    }
+
 protected:
+    unsigned int id;
     SwitchStand currentState;
 
 };

@@ -27,12 +27,16 @@
 #include "moba/direction.h"
 #include "moba/train.h"
 
-struct Block : public Node {
+struct Block;
 
-    Block() {
+using BlockPtr = std::shared_ptr<Block>;
+
+struct Block : public Node, std::enable_shared_from_this<Node> {
+
+    Block(unsigned int id): Node{id} {
     }
 
-    Block(TrainPtr train) : train{train} {
+    Block(unsigned int id, TrainPtr train): Node{id}, train{train} {
     }
 
     virtual ~Block() {
@@ -58,20 +62,10 @@ struct Block : public Node {
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
-       // if(train) {
+        if(train) {
             return NodePtr{};
-       // }
-
-        if(currentState == SwitchStand::BEND_1) {
-
         }
-/*
-        switch(currentState) {
-            case
-            case SwitchStand::BEND_2:
-                return NodePtr{};
-        }
-*/
+
         if(node == in) {
             return out;
         }
@@ -81,14 +75,35 @@ struct Block : public Node {
         throw NodeException{"invalid node given!"};
     }
 
-    NodePtr getNode() const {
-        // Hier irgendwie mit direction arbeiten...
+    BlockPtr getNextBlockInDirection() {
+        return getNextBlock(in);
+    }
 
-        //if(direction.value == DrivingDirection::BACKWARD) {
-        //    return out;
-        //}
+    BlockPtr getNextBlockOutDirection() {
+        return getNextBlock(out);
+    }
 
-        return in;
+    BlockPtr getNextTrainDependingBlock() const {
+        if(!isBlocked()) {
+            throw NodeException{"block not blocked!"};
+        }
+
+//        if(train->direction == DrivingDirection.BACKWARD) {
+//            return getNextBlock(in);
+//        }
+//        return getNextBlock(out);
+    }
+
+    bool isBlocked() const {
+        return (bool)train;
+    }
+
+    TrainPtr getTrain() const {
+        return train;
+    }
+
+    void setTrain(TrainPtr train) {
+        this->train = train;
     }
 
 protected:
@@ -97,5 +112,22 @@ protected:
 
     TrainPtr train;
 
+    BlockPtr getNextBlock(NodePtr b) {
+        if(!b) {
+            return BlockPtr{};
+        }
+
+        auto a = shared_from_this();
+
+        while(auto c = b->getJunctionNode(a)) {
+            auto derived = std::dynamic_pointer_cast<Block>(b);
+            if(derived) {
+                return derived;
+            }
+            a = b;
+            b = c;
+        }
+        return BlockPtr{};
+    }
 };
 
