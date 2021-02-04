@@ -59,8 +59,3 @@ void Screen::drawBlock(int i, const ContactData &contact, std::shared_ptr<Block>
         //train->localId
     }
 }
-
-
-
-
-
