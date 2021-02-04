@@ -83,15 +83,15 @@ struct Block : public Node, std::enable_shared_from_this<Node> {
         return getNextBlock(out);
     }
 
-    BlockPtr getNextTrainDependingBlock() const {
+    BlockPtr getNextTrainDependingBlock() {
         if(!isBlocked()) {
             throw NodeException{"block not blocked!"};
         }
 
-//        if(train->direction == DrivingDirection.BACKWARD) {
-//            return getNextBlock(in);
-//        }
-//        return getNextBlock(out);
+        if(train->direction.value == DrivingDirection::BACKWARD) {
+            return getNextBlock(in);
+        }
+        return getNextBlock(out);
     }
 
     bool isBlocked() const {
@@ -100,6 +100,18 @@ struct Block : public Node, std::enable_shared_from_this<Node> {
 
     TrainPtr getTrain() const {
         return train;
+    }
+
+    void pushTrain() {
+
+        auto nextBlock = getNextTrainDependingBlock();
+
+        if(!nextBlock) {
+            return;
+        }
+
+        nextBlock->train = train;
+        train = TrainPtr();
     }
 
     void setTrain(TrainPtr train) {
