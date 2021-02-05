@@ -86,9 +86,13 @@ class MessageLoop : private boost::noncopyable {
 
     EndpointPtr endpoint;
 
+    // in
     BlockContactDataMapPtr blockContacts;
     SwitchStandMapPtr switchstates;
+
+    // out
     BlockNodeMapPtr blockMap;
+    SwitchNodeMapPtr switchMap;
 
     Screen screen;
 

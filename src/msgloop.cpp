@@ -32,10 +32,11 @@ void MessageLoop::run() {
     while(!closing) {
         //try {
             Registry registry;
-            registry.registerHandler<GetLayout>([this](const GetLayout &d){parseLayout(d);});
-            registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d){contactTriggered(d);});
-            registry.registerHandler<GetBlockingContacts>([this](const GetBlockingContacts &d){getFeedbackContactList(d);});
+            registry.registerHandler<GetLayout>([this](const GetLayout &d) {parseLayout(d);});
+            registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d) {contactTriggered(d);});
+            registry.registerHandler<GetBlockingContacts>([this](const GetBlockingContacts &d) {getFeedbackContactList(d);});
             registry.registerHandler<GetSwitchStates>([this](const GetSwitchStates &d) {getSwitchStates(d);});
+            registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d) {contactTriggered(d);});
 
             endpoint->connect();
             endpoint->sendMsg(ControlGetContactListReq{});
@@ -64,8 +65,8 @@ void MessageLoop::parseLayout(const MessageLoop::GetLayout &d) {
     LayoutParser parser;
     parser.parse(d.symbols, blockContacts, switchstates);
 
-    auto blockMap = parser.getBlockMap();
-    auto switchMap = parser.getSwitchMap();
+    blockMap = parser.getBlockMap();
+    switchMap = parser.getSwitchMap();
 
     auto i = 0;
 
@@ -75,15 +76,17 @@ void MessageLoop::parseLayout(const MessageLoop::GetLayout &d) {
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
-   // d.contactTrigger.
-}
+    // Nur freiwerdende Bloecke beruecksichtigen
+    if(d.contactTrigger.state) {
+        return;
+    }
 
-void doit() {
-    BlockNodeMapPtr blockNode;
+    auto iter = blockMap->find(d.contactTrigger.contactData);
 
-    //for(auto &iter : *blockNode) {
+    // Wenn nicht in der Liste dann raus
+    if(iter == blockMap->end()) {
+        return;
+    }
 
 
-       // (*trainList)[iter["id"].GetInt()] = std::make_shared<Train>(iter);
-    //}
 }
