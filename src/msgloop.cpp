@@ -23,6 +23,7 @@
 
 #include "msgloop.h"
 #include "moba/registry.h"
+#include "moba/controlmessages.h"
 #include "layoutparser.h"
 
 MessageLoop::MessageLoop(EndpointPtr endpoint) : endpoint{endpoint}, closing{false} {
@@ -36,7 +37,9 @@ void MessageLoop::run() {
             registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d) {contactTriggered(d);});
             registry.registerHandler<GetBlockingContacts>([this](const GetBlockingContacts &d) {getFeedbackContactList(d);});
             registry.registerHandler<GetSwitchStates>([this](const GetSwitchStates &d) {getSwitchStates(d);});
-            registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d) {contactTriggered(d);});
+
+            //registry.registerHandler<ControlBlockLocked>([this](const ControlBlockLocked &d) {});
+            //registry.registerHandler<ControlBlockLockingFailed>([this](const ControlBlockLockingFailed &d) {});
 
             endpoint->connect();
             endpoint->sendMsg(ControlGetContactListReq{});
@@ -73,11 +76,12 @@ void MessageLoop::parseLayout(const MessageLoop::GetLayout &d) {
     for (const auto& [key, value] : *blockMap) {
         screen.drawBlock(i++, key, value);
     }
+    moveTrains();
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
-    // Nur freiwerdende Bloecke beruecksichtigen
-    if(d.contactTrigger.state) {
+    // Nur belegte Bloecke beruecksichtigen
+    if(!d.contactTrigger.state) {
         return;
     }
 
@@ -88,5 +92,16 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
         return;
     }
 
+    //iter->second
 
+
+    endpoint->sendMsg(ControlUnlockBlock{1, 1});
+
+    moveTrains();
+}
+
+void MessageLoop::moveTrains() {
+    for (const auto& [key, value] : *blockMap) {
+   //     screen.drawBlock(i++, key, value);
+    }
 }

@@ -102,6 +102,7 @@ class MessageLoop : private boost::noncopyable {
     void contactTriggered(const InterfaceContactTriggered &d);
     void getFeedbackContactList(const GetBlockingContacts &d);
     void getSwitchStates(const GetSwitchStates &d);
+    void moveTrains();
 
 public:
     MessageLoop(EndpointPtr endpoint);
