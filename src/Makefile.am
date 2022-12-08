@@ -9,7 +9,9 @@ moba_blocksystem_SOURCES = \
     screen.cpp
 
 moba_blocksystem_LDADD = \
-    -lmobacommon -lncurses $(GTKMM_LIBS) \
+    -lmobacommon \
+    -lncurses \
+    $(GTKMM_LIBS) \
     $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a \
     $(srcdir)/../modules/lib-tracklayout/src/moba/libtracklayout.a
 
