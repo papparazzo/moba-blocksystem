@@ -31,7 +31,7 @@ struct Block;
 
 using BlockPtr = std::shared_ptr<Block>;
 
-struct Block : public Node, std::enable_shared_from_this<Node> {
+struct Block: public Node, std::enable_shared_from_this<Node> {
 
     Block(unsigned int id): Node{id} {
     }

@@ -101,7 +101,7 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
 }
 
 void MessageLoop::moveTrains() {
-    for (const auto& [key, value] : *blockMap) {
+    for(const auto& [key, value]: *blockMap) {
    //     screen.drawBlock(i++, key, value);
     }
 }

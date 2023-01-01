@@ -27,15 +27,15 @@
 #include "moba/direction.h"
 #include "moba/switchstand.h"
 
-class NodeException : public std::exception {
+class NodeException: public std::exception {
 
     std::string what_;
 
 public:
-    explicit NodeException(const std::string &err) throw() : what_{err} {
+    explicit NodeException(const std::string &err) throw(): what_{err} {
     }
 
-    NodeException() throw() : what_{"Unknown error"} {
+    NodeException() throw(): what_{"Unknown error"} {
     }
 
     virtual ~NodeException() throw() {
@@ -50,7 +50,7 @@ struct Node;
 using NodePtr = std::shared_ptr<Node>;
 
 struct Node {
-    Node(unsigned int id, SwitchStand switchStand = SwitchStand::STRAIGHT_1) : id{id}, currentState{switchStand} {
+    Node(unsigned int id, SwitchStand switchStand = SwitchStand::STRAIGHT_1): id{id}, currentState{switchStand} {
     }
 
     virtual ~Node() {};
