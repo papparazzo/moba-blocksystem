@@ -30,14 +30,14 @@
 #include "common.h"
 #include "screen.h"
 
-class MessageLoop : private boost::noncopyable {
+class MessageLoop: private boost::noncopyable {
 
-    struct GetLayout : public LayoutMessage {
+    struct GetLayout: public LayoutMessage {
         static constexpr std::uint32_t MESSAGE_ID = LAYOUT_GET_LAYOUT_RES;
 
         GetLayout(const rapidjson::Document &d) {
             symbols = std::make_shared<Container<SymbolPtr>>();
-            for(auto &iter : d["symbols"].GetArray()) {
+            for(auto &iter: d["symbols"].GetArray()) {
                 symbols->addItem(
                     {
                         static_cast<std::size_t>(iter["xPos"].GetInt()),
@@ -51,10 +51,10 @@ class MessageLoop : private boost::noncopyable {
         LayoutContainerPtr symbols;
     };
 
-    struct GetBlockingContacts : public ControlMessage {
+    struct ControlGetContactListRes: public ControlMessage {
         static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_CONTACT_LIST_RES;
 
-        GetBlockingContacts(const rapidjson::Document &d) {
+        ControlGetContactListRes(const rapidjson::Document &d) {
             blockContacts = std::make_shared<std::map<Position, BlockContactDataPtr>>();
 
             for(auto &iter : d.GetArray()) {
@@ -100,7 +100,7 @@ class MessageLoop : private boost::noncopyable {
 
     void parseLayout(const GetLayout &d);
     void contactTriggered(const InterfaceContactTriggered &d);
-    void getFeedbackContactList(const GetBlockingContacts &d);
+    void getFeedbackContactList(const ControlGetContactListRes &d);
     void getSwitchStates(const GetSwitchStates &d);
     void moveTrains();
 

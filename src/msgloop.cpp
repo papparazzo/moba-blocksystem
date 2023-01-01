@@ -26,7 +26,7 @@
 #include "moba/controlmessages.h"
 #include "layoutparser.h"
 
-MessageLoop::MessageLoop(EndpointPtr endpoint) : endpoint{endpoint}, closing{false} {
+MessageLoop::MessageLoop(EndpointPtr endpoint): endpoint{endpoint}, closing{false} {
 }
 
 void MessageLoop::run() {
@@ -35,7 +35,7 @@ void MessageLoop::run() {
             Registry registry;
             registry.registerHandler<GetLayout>([this](const GetLayout &d) {parseLayout(d);});
             registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d) {contactTriggered(d);});
-            registry.registerHandler<GetBlockingContacts>([this](const GetBlockingContacts &d) {getFeedbackContactList(d);});
+            registry.registerHandler<ControlGetContactListRes>([this](const ControlGetContactListRes &d) {getFeedbackContactList(d);});
             registry.registerHandler<GetSwitchStates>([this](const GetSwitchStates &d) {getSwitchStates(d);});
 
             //registry.registerHandler<ControlBlockLocked>([this](const ControlBlockLocked &d) {});
@@ -54,7 +54,7 @@ void MessageLoop::run() {
     }
 }
 
-void MessageLoop::getFeedbackContactList(const GetBlockingContacts &d) {
+void MessageLoop::getFeedbackContactList(const ControlGetContactListRes &d) {
     blockContacts = d.blockContacts;
     endpoint->sendMsg(ControlGetSwitchStateListReq{});
 }
