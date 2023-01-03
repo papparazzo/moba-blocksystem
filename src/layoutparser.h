@@ -32,7 +32,7 @@
 #include "common.h"
 #include <functional>
 
-class LayoutParserException : public std::exception {
+class LayoutParserException: public std::exception {
     public:
         explicit LayoutParserException(const std::string &err) throw() : what_{err} {
         }
@@ -59,6 +59,7 @@ class LayoutParser {
     LayoutContainerPtr layout;
     BlockContactDataMapPtr blockContacts;
     SwitchStandMapPtr switchstates;
+    TrainListPtr trainList;
 
     // Out
     SwitchNodeMapPtr switches;
@@ -72,6 +73,7 @@ class LayoutParser {
     std::map<Position, NodeJunctions> nodes;
 
     void fetchBlockNodes(Direction dir, Position pos);
+    BlockPtr createBlock(int id, BlockContactDataPtr contact);
 
 public:
     LayoutParser() {
@@ -82,7 +84,7 @@ public:
     virtual ~LayoutParser(){
     }
 
-    void parse(LayoutContainerPtr layout, BlockContactDataMapPtr blockContacts, SwitchStandMapPtr switchstates);
+    void parse(LayoutContainerPtr layout, BlockContactDataMapPtr blockContacts, SwitchStandMapPtr switchstates, TrainListPtr trainList);
 
     SwitchNodeMapPtr getSwitchMap() {
         return switches;

@@ -81,7 +81,7 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         }
 
         if(block != blockContacts->end()) {
-            auto bNode = std::make_shared<Block>(curSymbol->id);
+            auto bNode = createBlock(curSymbol->id, block->second);
             sym = curSymbol->symbol;
             sym.reset();
             (*blocks)[block->second->blockContact] = bNode;
@@ -131,27 +131,29 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
     }
 }
 
-void LayoutParser::parse(LayoutContainerPtr layout, BlockContactDataMapPtr blockContacts, SwitchStandMapPtr switchstates) {
+void LayoutParser::parse(LayoutContainerPtr layout, BlockContactDataMapPtr blockContacts, SwitchStandMapPtr switchstates, TrainListPtr trainList) {
 
     this->layout = layout;
     this->blockContacts = blockContacts;
     this->switchstates = switchstates;
+    this->trainList = trainList;
 
-    auto firstBlock = blockContacts->begin();
-    if(firstBlock == blockContacts->end()) {
+    auto firstBlockContact = blockContacts->begin();
+    if(firstBlockContact == blockContacts->end()) {
         throw LayoutParserException{"no blocks found"};
     }
 
-    Position pos = firstBlock->first;
+    Position pos = firstBlockContact->first;
 
     auto curSymbol = layout->get(pos);
     auto dir1 = curSymbol->symbol.getNextJunction();
     auto dir2 = curSymbol->symbol.getNextJunction(dir1);
+    auto firstBlockContactData = firstBlockContact->second;
 
-    auto block = std::make_shared<Block>(curSymbol->id);
+    auto block = createBlock(curSymbol->id, firstBlockContactData);
     auto &tmp = nodes[pos];
 
-    (*blocks)[firstBlock->second->blockContact] = block;
+    (*blocks)[firstBlockContactData->blockContact] = block;
 
     tmp.node = block;
     tmp.junctions[dir1] = [dir1, block](const NodePtr &nptr) {block->setJunctionNode(dir1, nptr);};
@@ -166,4 +168,16 @@ void LayoutParser::parse(LayoutContainerPtr layout, BlockContactDataMapPtr block
 
     curSymbol->symbol.removeJunction(dir2);
     fetchBlockNodes(dir2, pos);
+}
+
+BlockPtr LayoutParser::createBlock(int id, BlockContactDataPtr contact) {
+    // get train from block and set it
+    auto iter = trainList->find(contact->trainId);
+    auto block = std::make_shared<Block>(id);
+
+    if(iter != trainList->end()) {
+        block->setTrain(iter->second);
+    }
+
+    return block;
 }
