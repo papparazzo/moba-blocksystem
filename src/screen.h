@@ -29,6 +29,7 @@ public:
 
     void drawBlock(int i, const ContactData &contact, std::shared_ptr<Block> block);
 
+    void printLine(const std::string &notice);
 
 private:
 

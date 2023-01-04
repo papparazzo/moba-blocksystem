@@ -25,6 +25,15 @@
 Screen::Screen() {
     initscr();
     curs_set(0);
+    noecho();
+
+    if(!has_colors()) {
+        return;
+    }
+
+    start_color();
+    init_pair(1, COLOR_RED,   COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
 }
 
 Screen::~Screen(){
@@ -34,28 +43,38 @@ Screen::~Screen(){
 void Screen::drawBlock(int i, const ContactData &contact, std::shared_ptr<Block> block) {
     auto in = block->getNextBlockInDirection();
     auto out = block->getNextBlockOutDirection();
+    auto train = block->getTrain();
 
-    mvprintw(i, 0, "Block #%d", i);
-    mvprintw(i, 11, "R %d/%d", contact.modulAddr, contact.contactNb);
-    if(in) {
-        mvprintw(i, 22, "[%d] <<<<", in->getId());
-    } else {
-        mvprintw(i, 22, "[---] <<<<");
-    }
-    mvprintw(i, 32, "<<<< [%d] <<<<", block->getId());
+    mvprintw(i, 0, "#%d Block %d   R %d/%d", i, block->getId(), contact.modulAddr, contact.contactNb);
     if(out) {
-        mvprintw(i, 47, "<<<< [%d]", out->getId());
+        mvprintw(i, 27, "[%d] >>>>", out->getId());
     } else {
-        mvprintw(i, 47, "<<<< [---]");
+        mvprintw(i, 27, "[---] >>>>");
+    }
+
+    if(train) {
+        mvprintw(i, 37, ">>>> [%d] >>>>", train->localId);
+    } else {
+        mvprintw(i, 37, ">>>> [-----] >>>>");
+    }
+
+    if(in) {
+        mvprintw(i, 54, ">>>> [%d]", in->getId());
+    } else {
+        mvprintw(i, 54, ">>>> [---]");
     }
 
     refresh();
-
-
-
-    auto train = block->getTrain();
-
-    if(train) {
-        //train->localId
-    }
 }
+
+void Screen::printLine(const std::string &notice) {
+    mvprintw(11, 0, "                                                                      ");
+    mvprintw(11, 0, "%s", notice.c_str());
+}
+
+/*
+    attrset(COLOR_PAIR(0));
+
+    attrset(COLOR_PAIR(2)); // green
+    attrset(COLOR_PAIR(1)); // red
+ */
