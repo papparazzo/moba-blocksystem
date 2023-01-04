@@ -20,75 +20,23 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include <memory>
 
-#include "moba/layoutmessages.h"
+#include "derivedmessages.h"
 #include "moba/interfacemessages.h"
-#include "moba/controlmessages.h"
 #include "moba/endpoint.h"
+#include "moba/train.h"
 #include "common.h"
 #include "screen.h"
 
-class MessageLoop: private boost::noncopyable {
-
-    struct GetLayout: public LayoutMessage {
-        static constexpr std::uint32_t MESSAGE_ID = LAYOUT_GET_LAYOUT_RES;
-
-        GetLayout(const rapidjson::Document &d) {
-            symbols = std::make_shared<Container<SymbolPtr>>();
-            for(auto &iter: d["symbols"].GetArray()) {
-                symbols->addItem(
-                    {
-                        static_cast<std::size_t>(iter["xPos"].GetInt()),
-                        static_cast<std::size_t>(iter["yPos"].GetInt())
-                    },
-                    std::make_shared<LayoutSymbol>(iter["id"].GetInt(), iter["symbol"].GetInt())
-                );
-            }
-        }
-
-        LayoutContainerPtr symbols;
-    };
-
-    struct ControlGetContactListRes: public ControlMessage {
-        static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_CONTACT_LIST_RES;
-
-        ControlGetContactListRes(const rapidjson::Document &d) {
-            blockContacts = std::make_shared<std::map<Position, BlockContactDataPtr>>();
-
-            for(auto &iter : d.GetArray()) {
-                (*blockContacts)[{
-                    static_cast<std::size_t>(iter["xPos"].GetInt()),
-                    static_cast<std::size_t>(iter["yPos"].GetInt())
-                }] = std::make_shared<BlockContactData>(iter);
-            }
-        }
-
-        BlockContactDataMapPtr blockContacts;
-    };
-
-    struct GetSwitchStates : public ControlMessage {
-        static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_SWITCH_STAND_LIST_RES;
-        GetSwitchStates(const rapidjson::Document &d) {
-            switchstates = std::make_shared<std::map<Position, SwitchStandData>>();
-
-            for(auto &iter : d.GetArray()) {
-                (*switchstates)[{
-                    static_cast<std::size_t>(iter["xPos"].GetInt()),
-                    static_cast<std::size_t>(iter["yPos"].GetInt())
-                }] = SwitchStandData{iter};
-            }
-        }
-
-        SwitchStandMapPtr switchstates;
-    };
+class MessageLoop {
 
     EndpointPtr endpoint;
 
     // in
     BlockContactDataMapPtr blockContacts;
     SwitchStandMapPtr switchstates;
+    TrainListPtr trainList;
 
     // out
     BlockNodeMapPtr blockMap;
@@ -98,13 +46,18 @@ class MessageLoop: private boost::noncopyable {
 
     bool closing;
 
-    void parseLayout(const GetLayout &d);
+    void parseLayout(const LayoutGetLayoutsRes_Derived &d);
     void contactTriggered(const InterfaceContactTriggered &d);
     void getFeedbackContactList(const ControlGetContactListRes &d);
-    void getSwitchStates(const GetSwitchStates &d);
+    void getSwitchStates(const ControlGetSwitchStandListRes &d);
+    void getTrainList(const ControlGetTrainListRes &d);
     void moveTrains();
 
 public:
     MessageLoop(EndpointPtr endpoint);
+
+    MessageLoop(const MessageLoop&) = delete;
+    MessageLoop& operator=(const MessageLoop&) = delete;
+
     void run();
 };

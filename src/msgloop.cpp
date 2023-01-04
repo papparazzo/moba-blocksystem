@@ -31,12 +31,13 @@ MessageLoop::MessageLoop(EndpointPtr endpoint): endpoint{endpoint}, closing{fals
 
 void MessageLoop::run() {
     while(!closing) {
-        //try {
+        try {
             Registry registry;
-            registry.registerHandler<GetLayout>([this](const GetLayout &d) {parseLayout(d);});
+            registry.registerHandler<LayoutGetLayoutsRes_Derived>([this](const LayoutGetLayoutsRes_Derived &d) {parseLayout(d);});
             registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d) {contactTriggered(d);});
             registry.registerHandler<ControlGetContactListRes>([this](const ControlGetContactListRes &d) {getFeedbackContactList(d);});
-            registry.registerHandler<GetSwitchStates>([this](const GetSwitchStates &d) {getSwitchStates(d);});
+            registry.registerHandler<ControlGetSwitchStandListRes>([this](const ControlGetSwitchStandListRes &d) {getSwitchStates(d);});
+            registry.registerHandler<ControlGetTrainListRes>([this](const ControlGetTrainListRes &d) {getTrainList(d);});
 
             //registry.registerHandler<ControlBlockLocked>([this](const ControlBlockLocked &d) {});
             //registry.registerHandler<ControlBlockLockingFailed>([this](const ControlBlockLockingFailed &d) {});
@@ -47,9 +48,9 @@ void MessageLoop::run() {
             while(true) {
                 registry.handleMsg(endpoint->waitForNewMsg());
             }
-        //} catch(const std::exception &e) {
-        //    LOG(moba::common::LogLevel::ERROR) << "exception occured! <" << e.what() << ">" << std::endl;
-        //}
+        } catch(const std::exception &e) {
+            std::cerr << "exception occured! <" << e.what() << ">" << std::endl;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
 }
@@ -59,29 +60,30 @@ void MessageLoop::getFeedbackContactList(const ControlGetContactListRes &d) {
     endpoint->sendMsg(ControlGetSwitchStateListReq{});
 }
 
-void MessageLoop::getSwitchStates(const GetSwitchStates &d) {
+void MessageLoop::getSwitchStates(const ControlGetSwitchStandListRes &d) {
     switchstates = d.switchstates;
+    endpoint->sendMsg(ControlGetTrainListReq{});
+}
+
+void MessageLoop::getTrainList(const ControlGetTrainListRes &d) {
+    trainList = d.trainList;
     endpoint->sendMsg(LayoutGetLayoutReadOnlyReq{});
 }
 
-void MessageLoop::parseLayout(const MessageLoop::GetLayout &d) {
+void MessageLoop::parseLayout(const LayoutGetLayoutsRes_Derived &d) {
     LayoutParser parser;
-    parser.parse(d.symbols, blockContacts, switchstates);
+    parser.parse(d.symbols, blockContacts, switchstates, trainList);
 
     blockMap = parser.getBlockMap();
     switchMap = parser.getSwitchMap();
 
-    auto i = 0;
-
-    for (const auto& [key, value] : *blockMap) {
-        screen.drawBlock(i++, key, value);
-    }
     moveTrains();
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
     // Nur belegte Bloecke beruecksichtigen
     if(!d.contactTrigger.state) {
+        std::cerr << std::endl << "ist nicht belet";
         return;
     }
 
@@ -92,16 +94,22 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
         return;
     }
 
+    iter->second->pushTrain();
+
     //iter->second
 
+    //    std::cerr << "Contact: " << d.contactTrigger.contactData.contactNb << std::endl;
 
-    endpoint->sendMsg(ControlUnlockBlock{1, 1});
+    // vorherigen Block freigeben:
+    //endpoint->sendMsg(ControlUnlockBlock{1, 1});
 
     moveTrains();
 }
 
 void MessageLoop::moveTrains() {
+    auto i = 0;
+
     for(const auto& [key, value]: *blockMap) {
-   //     screen.drawBlock(i++, key, value);
+        screen.drawBlock(i++, key, value);
     }
 }
