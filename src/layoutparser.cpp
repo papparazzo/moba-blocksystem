@@ -84,7 +84,7 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
             auto bNode = createBlock(curSymbol->id, block->second);
             sym = curSymbol->symbol;
             sym.reset();
-            (*blocks)[block->second->blockContact] = bNode;
+            (*blockNodeMap)[block->second->blockContact] = bNode;
             newNode = bNode;
         } else if(curSymbol->symbol.isLeftSwitch()) {
             sym = Symbol{Symbol::LEFT_SWITCH};
@@ -101,7 +101,7 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         }
 
         if(iters != switchstates->end()) {
-            (*switches)[iters->second.id] = newNode;
+            (*switcheNodeMap)[iters->second.id] = newNode;
         }
 
         curNode.node = newNode;
@@ -153,7 +153,7 @@ void LayoutParser::parse(LayoutContainerPtr layout, BlockContactDataMapPtr block
     auto block = createBlock(curSymbol->id, firstBlockContactData);
     auto &tmp = nodes[pos];
 
-    (*blocks)[firstBlockContactData->blockContact] = block;
+    (*blockNodeMap)[firstBlockContactData->blockContact] = block;
 
     tmp.node = block;
     tmp.junctions[dir1] = [dir1, block](const NodePtr &nptr) {block->setJunctionNode(dir1, nptr);};

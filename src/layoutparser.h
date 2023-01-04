@@ -62,8 +62,8 @@ class LayoutParser {
     TrainListPtr trainList;
 
     // Out
-    SwitchNodeMapPtr switches;
-    BlockNodeMapPtr blocks;
+    SwitchNodeMapPtr switcheNodeMap;
+    BlockNodeMapPtr blockNodeMap;
 
     struct NodeJunctions {
         std::map<Direction, NodeCallback> junctions;
@@ -77,8 +77,8 @@ class LayoutParser {
 
 public:
     LayoutParser() {
-        switches = std::make_shared<std::map<int, std::shared_ptr<Node>>>();
-        blocks = std::make_shared<std::map<ContactData, std::shared_ptr<Block>>>();
+        switcheNodeMap = std::make_shared<std::map<int, std::shared_ptr<Node>>>();
+        blockNodeMap = std::make_shared<std::map<ContactData, std::shared_ptr<Block>>>();
     }
 
     virtual ~LayoutParser(){
@@ -87,11 +87,11 @@ public:
     void parse(LayoutContainerPtr layout, BlockContactDataMapPtr blockContacts, SwitchStandMapPtr switchstates, TrainListPtr trainList);
 
     SwitchNodeMapPtr getSwitchMap() {
-        return switches;
+        return switcheNodeMap;
     }
 
     BlockNodeMapPtr getBlockMap() {
-        return blocks;
+        return blockNodeMap;
     }
 };
 
