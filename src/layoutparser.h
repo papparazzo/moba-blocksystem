@@ -86,11 +86,11 @@ public:
 
     void parse(LayoutContainerPtr layout, BlockContactDataMapPtr blockContacts, SwitchStandMapPtr switchstates, TrainListPtr trainList);
 
-    SwitchNodeMapPtr getSwitchMap() {
+    SwitchNodeMapPtr getSwitchMap() const {
         return switcheNodeMap;
     }
 
-    BlockNodeMapPtr getBlockMap() {
+    BlockNodeMapPtr getBlockMap() const {
         return blockNodeMap;
     }
 };
