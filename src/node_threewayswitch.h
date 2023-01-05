@@ -23,7 +23,7 @@
 #include "node.h"
 #include "moba/direction.h"
 
-struct ThreeWaySwitch : public Node {
+struct ThreeWaySwitch: public Node {
 
     using Node::Node;
 

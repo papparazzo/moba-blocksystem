@@ -23,7 +23,7 @@
 #include "node.h"
 #include "moba/direction.h"
 
-struct SimpleSwitch : public Node {
+struct SimpleSwitch: public Node {
 
     using Node::Node;
 

@@ -23,7 +23,7 @@
 #include "node.h"
 #include "moba/direction.h"
 
-struct CrossOverSwitch : public Node {
+struct CrossOverSwitch: public Node {
 
     using Node::Node;
 
