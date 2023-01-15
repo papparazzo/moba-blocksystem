@@ -83,7 +83,6 @@ void MessageLoop::parseLayout(const LayoutGetLayoutsRes_Derived &d) {
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
     // Nur belegte Bloecke beruecksichtigen
     if(!d.contactTrigger.state) {
-        std::cerr << std::endl << "ist nicht belet";
         return;
     }
 
@@ -95,10 +94,6 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
     }
 
     iter->second->pushTrain();
-
-    //iter->second
-
-    //    std::cerr << "Contact: " << d.contactTrigger.contactData.contactNb << std::endl;
 
     // vorherigen Block freigeben:
     //endpoint->sendMsg(ControlUnlockBlock{1, 1});
