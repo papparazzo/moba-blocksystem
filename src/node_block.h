@@ -21,6 +21,7 @@
 #pragma once
 
 #include <memory>
+#include <cassert>
 
 #include "node.h"
 #include "moba/driving_direction.h"
@@ -48,14 +49,14 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
             case Direction::TOP_RIGHT:
             case Direction::RIGHT:
             case Direction::BOTTOM_RIGHT:
-                out = node;
+                node1 = node;
                 return;
 
             case Direction::BOTTOM:
             case Direction::BOTTOM_LEFT:
             case Direction::LEFT:
             case Direction::TOP_LEFT:
-                in = node;
+                node2 = node;
                 return;
         }
         throw NodeException{"invalid direction given!"};
@@ -66,21 +67,21 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
             return NodePtr{};
         }
 
-        if(node == in) {
-            return out;
+        if(node == node1) {
+            return node2;
         }
-        if(node == out) {
-            return in;
+        if(node == node2) {
+            return node1;
         }
         throw NodeException{"invalid node given!"};
     }
 
     BlockPtr getNextBlockInDirection() {
-        return getNextBlock(in);
+        return getNextBlock(node1);
     }
 
     BlockPtr getNextBlockOutDirection() {
-        return getNextBlock(out);
+        return getNextBlock(node2);
     }
 
     BlockPtr getNextTrainDependingBlock() {
@@ -89,9 +90,9 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
         }
 
         if(train->direction.value == DrivingDirection::BACKWARD) {
-            return getNextBlock(in);
+            return getNextBlock(node1);
         }
-        return getNextBlock(out);
+        return getNextBlock(node2);
     }
 
     bool isBlocked() const {
@@ -119,8 +120,8 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
     }
 
 protected:
-    NodePtr in;
-    NodePtr out;
+    NodePtr node1;
+    NodePtr node2;
 
     TrainPtr train;
 
