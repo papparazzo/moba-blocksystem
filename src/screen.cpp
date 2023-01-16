@@ -22,7 +22,11 @@
 
 #include <curses.h>
 
-Screen::Screen() {
+Screen::Screen(bool ignore): ignore{ignore} {
+    if(ignore) {
+        return;
+    }
+
     initscr();
     curs_set(0);
     noecho();
@@ -41,6 +45,10 @@ Screen::~Screen(){
 }
 
 void Screen::drawBlock(int i, const ContactData &contact, std::shared_ptr<Block> block) {
+    if(ignore) {
+        return;
+    }
+
     auto in = block->getNextBlockInDirection();
     auto out = block->getNextBlockOutDirection();
     auto train = block->getTrain();
@@ -68,6 +76,10 @@ void Screen::drawBlock(int i, const ContactData &contact, std::shared_ptr<Block>
 }
 
 void Screen::printLine(const std::string &notice) {
+    if(ignore) {
+        return;
+    }
+
     mvprintw(11, 0, "                                                                      ");
     mvprintw(11, 0, "%s", notice.c_str());
 }

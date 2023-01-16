@@ -24,7 +24,7 @@
 
 class Screen {
 public:
-    Screen();
+    Screen(bool ignore = false);
     virtual ~Screen();
 
     void drawBlock(int i, const ContactData &contact, std::shared_ptr<Block> block);
@@ -32,6 +32,6 @@ public:
     void printLine(const std::string &notice);
 
 private:
-
+    bool ignore;
 };
 
