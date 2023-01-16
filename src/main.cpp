@@ -49,6 +49,11 @@ int main(int argc, char *argv[]) {
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
     auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::CLIENT, Message::LAYOUT, Message::INTERFACE}}};
 
-    MessageLoop loop(endpoint);
+    auto en = true;
+    if(argc > 1) {
+        en = false;
+    }
+
+    MessageLoop loop(endpoint, en);
     loop.run();
 }
