@@ -54,7 +54,7 @@ class MessageLoop {
     void moveTrains();
 
 public:
-    MessageLoop(EndpointPtr endpoint);
+    MessageLoop(EndpointPtr endpoint, bool enableScreen);
 
     MessageLoop(const MessageLoop&) = delete;
     MessageLoop& operator=(const MessageLoop&) = delete;
