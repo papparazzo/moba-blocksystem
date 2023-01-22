@@ -49,14 +49,14 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
             case Direction::TOP_RIGHT:
             case Direction::RIGHT:
             case Direction::BOTTOM_RIGHT:
-                node1 = node;
+                out = node;
                 return;
 
             case Direction::BOTTOM:
             case Direction::BOTTOM_LEFT:
             case Direction::LEFT:
             case Direction::TOP_LEFT:
-                node2 = node;
+                in = node;
                 return;
         }
         throw NodeException{"invalid direction given!"};
@@ -67,32 +67,25 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
             return NodePtr{};
         }
 
-        if(node == node1) {
-            return node2;
+        if(node == in) {
+            return out;
         }
-        if(node == node2) {
-            return node1;
+        if(node == out) {
+            return in;
         }
         throw NodeException{"invalid node given!"};
     }
 
     BlockPtr getNextBlockInDirection() {
-        return getNextBlock(node1);
+        return getNextBlock(in);
     }
 
     BlockPtr getNextBlockOutDirection() {
-        return getNextBlock(node2);
+        return getNextBlock(out);
     }
 
-    BlockPtr getNextTrainDependingBlock() {
-        if(!isBlocked()) {
-            throw NodeException{"block not blocked!"};
-        }
-
-        if(train->direction.value == DrivingDirection::BACKWARD) {
-            return getNextBlock(node1);
-        }
-        return getNextBlock(node2);
+    bool isIn(NodePtr b) {
+        return b == in;
     }
 
     bool isBlocked() const {
@@ -103,9 +96,21 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
         return train;
     }
 
-    void pushTrain() {
+    void setTrain(TrainPtr train) {
+        this->train = train;
+    }
 
-        auto nextBlock = getNextTrainDependingBlock();
+    void pushTrain() {
+        if(!isBlocked()) {
+            throw NodeException{"block not blocked!"};
+        }
+
+        BlockPtr nextBlock;
+
+        if(train->direction.value == DrivingDirection::BACKWARD) {
+            nextBlock = getNextBlock(in);
+        }
+        nextBlock = getNextBlock(out);
 
         if(!nextBlock) {
             return;
@@ -115,13 +120,9 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
         train = TrainPtr();
     }
 
-    void setTrain(TrainPtr train) {
-        this->train = train;
-    }
-
 protected:
-    NodePtr node1;
-    NodePtr node2;
+    NodePtr in;
+    NodePtr out;
 
     TrainPtr train;
 
@@ -135,6 +136,9 @@ protected:
         while(auto c = b->getJunctionNode(a)) {
             auto derived = std::dynamic_pointer_cast<Block>(b);
             if(derived) {
+                if(!derived->isIn(a)) {
+                    this->train->switchDirection();
+                }
                 return derived;
             }
             a = b;
