@@ -40,7 +40,7 @@ Screen::Screen(bool ignore): ignore{ignore} {
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
 }
 
-Screen::~Screen(){
+Screen::~Screen() {
     endwin();
 }
 
