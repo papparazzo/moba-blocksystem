@@ -102,6 +102,7 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
 
     void pushTrain() {
         if(!isBlocked()) {
+            std::cout << "id: " << this->id << std::endl;
             throw NodeException{"block not blocked!"};
         }
 
@@ -136,7 +137,7 @@ protected:
         while(auto c = b->getJunctionNode(a)) {
             auto derived = std::dynamic_pointer_cast<Block>(b);
             if(derived) {
-                if(!derived->isIn(a)) {
+                if(!derived->isIn(a) && this->train) {
                     this->train->switchDirection();
                 }
                 return derived;
