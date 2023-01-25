@@ -84,8 +84,8 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
         return getNextBlock(out);
     }
 
-    bool isIn(NodePtr b) {
-        return b == in;
+   bool isOut(NodePtr b) const {
+        return b == out;
     }
 
     bool isBlocked() const {
@@ -100,25 +100,24 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
         this->train = train;
     }
 
-    void pushTrain() {
+    BlockPtr pushTrain() {
         if(!isBlocked()) {
-            std::cout << "id: " << this->id << std::endl;
             throw NodeException{"block not blocked!"};
         }
 
         BlockPtr nextBlock;
 
-        if(train->direction.value == DrivingDirection::BACKWARD) {
+        if(train->direction.value == DrivingDirection::FORWARD) {
+            nextBlock = getNextBlock(out);
+        } else {
             nextBlock = getNextBlock(in);
         }
-        nextBlock = getNextBlock(out);
 
-        if(!nextBlock) {
-            return;
+        if(nextBlock) {
+            nextBlock->setTrain(train);
+            train = TrainPtr();
         }
-
-        nextBlock->train = train;
-        train = TrainPtr();
+        return nextBlock;
     }
 
 protected:
@@ -137,8 +136,8 @@ protected:
         while(auto c = b->getJunctionNode(a)) {
             auto derived = std::dynamic_pointer_cast<Block>(b);
             if(derived) {
-                if(!derived->isIn(a) && this->train) {
-                    this->train->switchDirection();
+                if(train && derived->isOut(a)) {
+                    train->switchDirection();
                 }
                 return derived;
             }
