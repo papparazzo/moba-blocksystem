@@ -77,7 +77,7 @@ void MessageLoop::parseLayout(const LayoutGetLayoutsRes_Derived &d) {
     blockMap = parser.getBlockMap();
     switchMap = parser.getSwitchMap();
 
-    moveTrains();
+    updateScreen();
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
@@ -98,10 +98,10 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
     // vorherigen Block freigeben:
     //endpoint->sendMsg(ControlUnlockBlock{1, 1});
 
-    moveTrains();
+    updateScreen();
 }
 
-void MessageLoop::moveTrains() {
+void MessageLoop::updateScreen() {
     auto i = 0;
 
     for(const auto& [key, value]: *blockMap) {

@@ -42,16 +42,16 @@ class MessageLoop {
     BlockNodeMapPtr blockMap;
     SwitchNodeMapPtr switchMap;
 
-    Screen screen;
-
     bool closing;
+
+    Screen screen;
 
     void parseLayout(const LayoutGetLayoutsRes_Derived &d);
     void contactTriggered(const InterfaceContactTriggered &d);
     void getFeedbackContactList(const ControlGetContactListRes &d);
     void getSwitchStates(const ControlGetSwitchStandListRes &d);
     void getTrainList(const ControlGetTrainListRes &d);
-    void moveTrains();
+    void updateScreen();
 
 public:
     MessageLoop(EndpointPtr endpoint, bool enableScreen);
