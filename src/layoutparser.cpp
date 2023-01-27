@@ -172,7 +172,7 @@ void LayoutParser::parse(LayoutContainerPtr layout, BlockContactDataMapPtr block
 
 BlockPtr LayoutParser::createBlock(int id, BlockContactDataPtr contact) {
     // get train from block and set it
-    auto iter = trainList->find(contact->trainId);
+    auto iter = trainList->find(contact->id);
     auto block = std::make_shared<Block>(id);
 
     if(iter != trainList->end()) {
