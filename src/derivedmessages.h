@@ -43,10 +43,10 @@ struct LayoutGetLayoutsRes_Derived: public LayoutMessage {
     LayoutContainerPtr symbols;
 };
 
-struct ControlGetContactListRes: public ControlMessage {
+struct ControlGetBlockListRes: public ControlMessage {
     static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_BLOCK_LIST_RES;
 
-    ControlGetContactListRes(const rapidjson::Document &d) {
+    ControlGetBlockListRes(const rapidjson::Document &d) {
         blockContacts = std::make_shared<std::map<Position, BlockContactDataPtr>>();
 
         for(auto &iter : d.GetArray()) {

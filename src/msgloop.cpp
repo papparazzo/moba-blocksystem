@@ -35,7 +35,7 @@ void MessageLoop::run() {
             Registry registry;
             registry.registerHandler<LayoutGetLayoutsRes_Derived>([this](const LayoutGetLayoutsRes_Derived &d) {parseLayout(d);});
             registry.registerHandler<InterfaceContactTriggered>([this](const InterfaceContactTriggered &d) {contactTriggered(d);});
-            registry.registerHandler<ControlGetContactListRes>([this](const ControlGetContactListRes &d) {getFeedbackContactList(d);});
+            registry.registerHandler<ControlGetBlockListRes>([this](const ControlGetBlockListRes &d) {getFeedbackContactList(d);});
             registry.registerHandler<ControlGetSwitchStandListRes>([this](const ControlGetSwitchStandListRes &d) {getSwitchStates(d);});
             registry.registerHandler<ControlGetTrainListRes>([this](const ControlGetTrainListRes &d) {getTrainList(d);});
 
@@ -55,7 +55,7 @@ void MessageLoop::run() {
     }
 }
 
-void MessageLoop::getFeedbackContactList(const ControlGetContactListRes &d) {
+void MessageLoop::getFeedbackContactList(const ControlGetBlockListRes &d) {
     blockContacts = d.blockContacts;
     endpoint->sendMsg(ControlGetSwitchStateListReq{});
 }

@@ -48,7 +48,7 @@ class MessageLoop {
 
     void parseLayout(const LayoutGetLayoutsRes_Derived &d);
     void contactTriggered(const InterfaceContactTriggered &d);
-    void getFeedbackContactList(const ControlGetContactListRes &d);
+    void getFeedbackContactList(const ControlGetBlockListRes &d);
     void getSwitchStates(const ControlGetSwitchStandListRes &d);
     void getTrainList(const ControlGetTrainListRes &d);
     void updateScreen();
