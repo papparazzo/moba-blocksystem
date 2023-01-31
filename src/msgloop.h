@@ -27,7 +27,6 @@
 #include "moba/endpoint.h"
 #include "moba/train.h"
 #include "common.h"
-#include "screen.h"
 
 class MessageLoop {
 
@@ -44,17 +43,14 @@ class MessageLoop {
 
     bool closing;
 
-    Screen screen;
-
     void parseLayout(const LayoutGetLayoutsRes_Derived &d);
     void contactTriggered(const InterfaceContactTriggered &d);
     void getFeedbackContactList(const ControlGetBlockListRes &d);
     void getSwitchStates(const ControlGetSwitchStandListRes &d);
     void getTrainList(const ControlGetTrainListRes &d);
-    void updateScreen();
 
 public:
-    MessageLoop(EndpointPtr endpoint, bool enableScreen);
+    MessageLoop(EndpointPtr endpoint);
 
     MessageLoop(const MessageLoop&) = delete;
     MessageLoop& operator=(const MessageLoop&) = delete;

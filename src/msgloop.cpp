@@ -26,7 +26,7 @@
 #include "moba/controlmessages.h"
 #include "layoutparser.h"
 
-MessageLoop::MessageLoop(EndpointPtr endpoint, bool enableScreen): endpoint{endpoint}, closing{false}, screen{enableScreen} {
+MessageLoop::MessageLoop(EndpointPtr endpoint): endpoint{endpoint}, closing{false} {
 }
 
 void MessageLoop::run() {
@@ -76,8 +76,6 @@ void MessageLoop::parseLayout(const LayoutGetLayoutsRes_Derived &d) {
 
     blockMap = parser.getBlockMap();
     switchMap = parser.getSwitchMap();
-
-    updateScreen();
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
@@ -93,18 +91,11 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
         return;
     }
 
-    iter->second->pushTrain();
+    auto block = iter->second->pushTrain();
+    auto train = block->getTrain();
+
+    endpoint->sendMsg(ControlPushTrain{block->getId(), train->address, train->direction});
 
     // vorherigen Block freigeben:
     //endpoint->sendMsg(ControlUnlockBlock{1, 1});
-
-    updateScreen();
-}
-
-void MessageLoop::updateScreen() {
-    auto i = 0;
-
-    for(const auto& [key, value]: *blockMap) {
-        screen.drawBlock(i++, key, value);
-    }
 }
