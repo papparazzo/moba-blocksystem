@@ -33,13 +33,19 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
     auto startPos = curPos;
 
     while(true) {
+        // Schritt weiter zum nächsten Symbol
         curPos.setNewPosition(curDir);
 
+        // Symbol von der aktuellen Position im Gleisplan
         auto curSymbol = layout->get(curPos);
         auto compDir = curDir.getComplementaryDirection();
 
+        if(!curSymbol) {
+            throw LayoutParserException{"invalid layout: No symbol at current position"};
+        }
+
         if(!curSymbol->symbol.isJunctionSet(compDir)) {
-            return;
+            throw LayoutParserException{"invalid layout: no open junctions"};
         }
 
         curSymbol->symbol.removeJunction(compDir);
@@ -48,24 +54,25 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
             return;
         }
 
-        if(!curSymbol->symbol.isCrossOver() && !curSymbol->symbol.isCrossOverSwitch()) {
-            curDir = curSymbol->symbol.getNextOpenJunction();
-        }
-
-        //FIXME Prüfen ob DKW einen Antrieb hat!
+        // Prüfen, ob Symbol keine Weiche und kein Block ist
         auto block = blockContacts->find(curPos);
-        if(block == blockContacts->end() && !curSymbol->symbol.isSwitch() /* && !curSymbol->hasAntrieb*/) {
-            curSymbol->symbol.removeJunction(curDir);
+        if(curSymbol->symbol.isTrack() && block == blockContacts->end()) {
+            // FIXME: Prüfen, ob Doppelte Kreuzungsweiche ohne Antrieb
+            if(!curSymbol->symbol.isCrossOver() /*|| curSymbol->symbol.isCrossOverSwitch()*/) {
+                curDir = curSymbol->symbol.getNextOpenJunction(curDir);
+            }
             continue;
         }
 
+        // Ab hier entweder Weiche oder Block! Startknoten ermitteln...
         auto &startNode = nodes[startPos];
 
+        // Existiert an aktueller Stelle schon ein Knoten?
         auto iter = nodes.find(curPos);
         if(iter != nodes.end()) {
+            //... wenn ja, diesen mit dem Startknoten verbinden und Funktion verlassen
             startNode.junctions[startDir](iter->second.node);
             iter->second.junctions[compDir](startNode.node);
-            curSymbol->symbol.removeJunction(curDir);
             return;
         }
 
@@ -73,35 +80,13 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         NodePtr newNode;
         Symbol sym;
 
-        auto stand = SwitchStand::STRAIGHT_1;
-
-        auto iters = switchstates->find(curPos);
-        if(iters != switchstates->end()) {
-            stand = iters->second.switchStand;
-        }
-
+        // Knoten ist ein Blockknoten
         if(block != blockContacts->end()) {
             auto bNode = createBlock(curSymbol->id, block->second);
             sym = curSymbol->symbol;
             sym.reset();
             (*blockNodeMap)[block->second->blockContact] = bNode;
             newNode = bNode;
-        } else if(curSymbol->symbol.isLeftSwitch()) {
-            sym = Symbol{Symbol::LEFT_SWITCH};
-            newNode = std::make_shared<SimpleSwitch>(curSymbol->id, stand);
-        } else if(curSymbol->symbol.isRightSwitch()) {
-            sym = Symbol{Symbol::RIGHT_SWITCH};
-            newNode = std::make_shared<SimpleSwitch>(curSymbol->id, stand);
-        } else if(curSymbol->symbol.isCrossOverSwitch()) {
-            sym = Symbol{Symbol::CROSS_OVER_SWITCH};
-            newNode = std::make_shared<CrossOverSwitch>(curSymbol->id, stand);
-        } else if(curSymbol->symbol.isThreeWaySwitch()) {
-            sym = Symbol{Symbol::THREE_WAY_SWITCH};
-            newNode = std::make_shared<ThreeWaySwitch>(curSymbol->id, stand);
-        }
-
-        if(iters != switchstates->end()) {
-            (*switcheNodeMap)[iters->second.id] = newNode;
         }
 
         curNode.node = newNode;
@@ -118,13 +103,20 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
 
         sym.reset();
 
-        while((dir = sym.getNextOpenJunction()) != Direction::UNSET) {
-            sym.removeJunction(dir);
+        dir = Direction::TOP_LEFT;
+
+        while((dir = sym.getNextOpenJunction(dir)) != Direction::UNSET) {
             if(dir + offset == compDir) {
+                sym.removeJunction(dir);
                 curNode.junctions[compDir](startNode.node);
-                continue;
+                break;
             }
-            curSymbol->symbol.removeJunction(dir + offset);
+        }
+
+        dir = Direction::TOP_LEFT;
+
+        while((dir = sym.getNextOpenJunction(dir)) != Direction::UNSET) {
+            sym.removeJunction(dir + offset);
             fetchBlockNodes(dir + offset, curPos);
         }
         return;
@@ -172,7 +164,7 @@ void LayoutParser::parse(LayoutContainerPtr layout, BlockContactDataMapPtr block
 
 BlockPtr LayoutParser::createBlock(int id, BlockContactDataPtr contact) {
     // get train from block and set it
-    auto iter = trainList->find(contact->id);
+    auto iter = trainList->find(contact->trainId);
     auto block = std::make_shared<Block>(id);
 
     if(iter != trainList->end()) {
