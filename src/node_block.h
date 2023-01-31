@@ -76,15 +76,7 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
         throw NodeException{"invalid node given!"};
     }
 
-    BlockPtr getNextBlockInDirection() {
-        return getNextBlock(in);
-    }
-
-    BlockPtr getNextBlockOutDirection() {
-        return getNextBlock(out);
-    }
-
-   bool isOut(NodePtr b) const {
+    bool isOut(NodePtr b) const {
         return b == out;
     }
 
@@ -107,7 +99,7 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
 
         BlockPtr nextBlock;
 
-        if(train->direction.value == DrivingDirection::FORWARD) {
+        if(train->direction.drivingDirection == DrivingDirection::FORWARD) {
             nextBlock = getNextBlock(out);
         } else {
             nextBlock = getNextBlock(in);
@@ -126,23 +118,28 @@ protected:
 
     TrainPtr train;
 
-    BlockPtr getNextBlock(NodePtr b) {
-        if(!b) {
+    BlockPtr getNextBlock(NodePtr nextNode) {
+        if(!nextNode) {
             return BlockPtr{};
         }
 
-        auto a = shared_from_this();
+        auto curNode = shared_from_this();
 
-        while(auto c = b->getJunctionNode(a)) {
-            auto derived = std::dynamic_pointer_cast<Block>(b);
-            if(derived) {
-                if(train && derived->isOut(a)) {
-                    train->switchDirection();
+        while(auto afterNextNode = nextNode->getJunctionNode(curNode)) {
+            auto nextBlock = std::dynamic_pointer_cast<Block>(nextNode);
+            if(nextBlock) {
+                if(!train) {
+                    return nextBlock;
                 }
-                return derived;
+                if(nextBlock->isOut(curNode)) {
+                    train->direction.drivingDirection = DrivingDirection::BACKWARD;
+                } else {
+                    train->direction.drivingDirection = DrivingDirection::FORWARD;
+                }
+                return nextBlock;
             }
-            a = b;
-            b = c;
+            curNode = nextNode;
+            nextNode = afterNextNode;
         }
         return BlockPtr{};
     }
