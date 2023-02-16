@@ -43,7 +43,7 @@ void MessageLoop::run() {
             //registry.registerHandler<ControlBlockLockingFailed>([this](const ControlBlockLockingFailed &d) {});
 
             endpoint->connect();
-            endpoint->sendMsg(ControlGetContactListReq{});
+            endpoint->sendMsg(ControlGetBlockListReq{});
 
             while(true) {
                 registry.handleMsg(endpoint->waitForNewMsg());
