@@ -27,6 +27,7 @@
 #include "node_threewayswitch.h"
 #include "node_simpleswitch.h"
 #include "moba/shared.h"
+#include <cassert>
 
 void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
     auto startDir = curDir;
@@ -40,13 +41,8 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
         auto curSymbol = layout->get(curPos);
         auto compDir = curDir.getComplementaryDirection();
 
-        if(!curSymbol) {
-            throw LayoutParserException{"invalid layout: No symbol at current position"};
-        }
-
-        if(!curSymbol->symbol.isJunctionSet(compDir)) {
-            throw LayoutParserException{"invalid layout: no open junctions"};
-        }
+        assert((curSymbol) && "invalid layout: No symbol at current position");
+        assert((curSymbol->symbol.isJunctionSet(compDir)) && "invalid layout: no open junctions");
 
         curSymbol->symbol.removeJunction(compDir);
 
