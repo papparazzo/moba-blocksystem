@@ -50,11 +50,13 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
             return;
         }
 
-        // Prüfen, ob Symbol keine Weiche und kein Block ist
         auto block = blockContacts->find(curPos);
-        if(curSymbol->symbol.isTrack() && block == blockContacts->end()) {
-            // FIXME: Prüfen, ob Doppelte Kreuzungsweiche ohne Antrieb
-            if(!curSymbol->symbol.isCrossOver() /*|| curSymbol->symbol.isCrossOverSwitch()*/) {
+        auto iters = switchstates->find(curPos);
+
+        // Prüfen, ob Symbol keine Weiche und kein Block ist
+        if(block == blockContacts->end() && iters != switchstates->end()) {
+            // Wenn Symbol gerades Gleis oder Kreuzung dann einfach weiter in Richtung
+            if(curSymbol->symbol.isBend()) {
                 curDir = curSymbol->symbol.getNextOpenJunction(curDir);
             }
             continue;
@@ -69,20 +71,59 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
             //... wenn ja, diesen mit dem Startknoten verbinden und Funktion verlassen
             startNode.junctions[startDir](iter->second.node);
             iter->second.junctions[compDir](startNode.node);
+            curSymbol->symbol.removeJunction(curDir);
             return;
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         auto &curNode = nodes[curPos];
         NodePtr newNode;
         Symbol sym;
 
+        auto stand = SwitchStand::STRAIGHT_1;
+
         // Knoten ist ein Blockknoten
+        auto iters = switchstates->find(curPos);
+        if(iters != switchstates->end()) {
+            stand = iters->second.switchStand;
+        }
+
         if(block != blockContacts->end()) {
             auto bNode = createBlock(curSymbol->id, block->second);
             sym = curSymbol->symbol;
             sym.reset();
             (*blockNodeMap)[block->second->blockContact] = bNode;
             newNode = bNode;
+        } else if(curSymbol->symbol.isLeftSwitch()) {
+            sym = Symbol{Symbol::LEFT_SWITCH};
+            newNode = std::make_shared<SimpleSwitch>(curSymbol->id, stand);
+        } else if(curSymbol->symbol.isRightSwitch()) {
+            sym = Symbol{Symbol::RIGHT_SWITCH};
+            newNode = std::make_shared<SimpleSwitch>(curSymbol->id, stand);
+        } else if(curSymbol->symbol.isCrossOverSwitch()) {
+            sym = Symbol{Symbol::CROSS_OVER_SWITCH};
+            newNode = std::make_shared<CrossOverSwitch>(curSymbol->id, stand);
+        } else if(curSymbol->symbol.isThreeWaySwitch()) {
+            sym = Symbol{Symbol::THREE_WAY_SWITCH};
+            newNode = std::make_shared<ThreeWaySwitch>(curSymbol->id, stand);
+        }
+
+        if(iters != switchstates->end()) {
+            (*switcheNodeMap)[iters->second.id] = newNode;
         }
 
         curNode.node = newNode;
@@ -99,20 +140,13 @@ void LayoutParser::fetchBlockNodes(Direction curDir, Position curPos) {
 
         sym.reset();
 
-        dir = Direction::TOP_LEFT;
-
-        while((dir = sym.getNextOpenJunction(dir)) != Direction::UNSET) {
+        while((dir = sym.getNextOpenJunction()) != Direction::UNSET) {
+            sym.removeJunction(dir);
             if(dir + offset == compDir) {
-                sym.removeJunction(dir);
                 curNode.junctions[compDir](startNode.node);
-                break;
+                continue;
             }
-        }
-
-        dir = Direction::TOP_LEFT;
-
-        while((dir = sym.getNextOpenJunction(dir)) != Direction::UNSET) {
-            sym.removeJunction(dir + offset);
+            curSymbol->symbol.removeJunction(dir + offset);
             fetchBlockNodes(dir + offset, curPos);
         }
         return;
