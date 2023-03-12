@@ -41,6 +41,7 @@ void MessageLoop::run() {
 
             //registry.registerHandler<ControlBlockLocked>([this](const ControlBlockLocked &d) {});
             //registry.registerHandler<ControlBlockLockingFailed>([this](const ControlBlockLockingFailed &d) {});
+            registry.registerHandler<LayoutDefaultLayoutChanged>([this](LayoutDefaultLayoutChanged &d) {endpoint->sendMsg(ControlGetBlockListReq{})});
 
             endpoint->connect();
             endpoint->sendMsg(ControlGetBlockListReq{});
