@@ -55,6 +55,7 @@ struct Node {
 
     virtual ~Node() {};
     virtual NodePtr getJunctionNode(NodePtr node) const = 0;
+    virtual NodePtr getJunctionNode(Direction dir) const = 0;
     virtual void setJunctionNode(Direction dir, NodePtr node) = 0;
 
     void turn(SwitchStand stand) {
