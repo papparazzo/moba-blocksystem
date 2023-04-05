@@ -72,6 +72,23 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
         throw NodeException{"invalid node given!"};
     }
 
+    NodePtr getJunctionNode(Direction dir) const {
+        switch(dir) {
+            case Direction::TOP:
+            case Direction::TOP_RIGHT:
+            case Direction::RIGHT:
+            case Direction::BOTTOM_RIGHT:
+                return out;
+
+            case Direction::BOTTOM:
+            case Direction::BOTTOM_LEFT:
+            case Direction::LEFT:
+            case Direction::TOP_LEFT:
+                return in;
+        }
+        throw NodeException{"invalid direction given!"};
+    }
+    
     bool isOut(NodePtr b) const {
         return b == out;
     }

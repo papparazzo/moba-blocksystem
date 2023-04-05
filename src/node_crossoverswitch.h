@@ -70,6 +70,23 @@ struct CrossOverSwitch: public Node {
         return NodePtr{};
     }
 
+    NodePtr getJunctionNode(Direction dir) const {
+        switch(dir) {
+            case Direction::TOP:
+                return outTop;
+
+            case Direction::TOP_RIGHT:
+                return outRight;
+
+            case Direction::BOTTOM:
+                return inBottom;
+
+            case Direction::BOTTOM_LEFT:
+                return inLeft;
+        }
+        throw NodeException{"invalid direction given!"};
+    }
+
     NodePtr getInNode() const {
         switch(currentState) {
             case SwitchStand::BEND_1:

@@ -83,6 +83,23 @@ struct ThreeWaySwitch: public Node {
         return NodePtr{};
     }
 
+    NodePtr getJunctionNode(Direction dir) const {
+        switch(dir) {
+            case Direction::TOP:
+                return outStraight;
+
+            case Direction::TOP_LEFT:
+                return outBendLeft;
+
+            case Direction::TOP_RIGHT:
+                return outBendRight;
+
+            case Direction::BOTTOM:
+                return in;
+        }
+        throw NodeException{"invalid direction given!"};
+    }
+
 protected:
     NodePtr in;
     NodePtr outStraight;

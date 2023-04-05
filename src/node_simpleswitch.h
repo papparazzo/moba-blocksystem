@@ -67,6 +67,21 @@ struct SimpleSwitch: public Node {
         return NodePtr{};
     }
 
+    NodePtr getJunctionNode(Direction dir) const {
+        switch(dir) {
+            case Direction::TOP:
+                return outStraight;
+
+            case Direction::TOP_LEFT:
+            case Direction::TOP_RIGHT:
+                return outBend;
+
+            case Direction::BOTTOM:
+                return in;
+        }
+        throw NodeException{"invalid direction given!"};
+    }
+    
 protected:
     NodePtr in;
     NodePtr outStraight;
