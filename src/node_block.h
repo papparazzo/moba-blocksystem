@@ -63,10 +63,6 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
     }
 
     NodePtr getJunctionNode(NodePtr node) const {
-        if(train) {
-            return NodePtr{};
-        }
-
         if(node == in) {
             return out;
         }
@@ -128,6 +124,10 @@ protected:
         while(auto afterNextNode = nextNode->getJunctionNode(curNode)) {
             auto nextBlock = std::dynamic_pointer_cast<Block>(nextNode);
             if(nextBlock) {
+                if(nextBlock->isBlocked() ) {
+                    return BlockPtr{};
+                }
+                
                 if(!train) {
                     return nextBlock;
                 }
