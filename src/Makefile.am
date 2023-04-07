@@ -5,7 +5,8 @@ bin_PROGRAMS = \
 moba_blocksystem_SOURCES = \
     layoutparser.cpp \
     main.cpp \
-    msgloop.cpp
+    msgloop.cpp \
+    screen.cpp
 
 moba_blocksystem_LDADD = \
     -lmobacommon \
