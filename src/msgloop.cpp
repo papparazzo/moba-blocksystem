@@ -50,7 +50,7 @@ void MessageLoop::run() {
                 registry.handleMsg(endpoint->waitForNewMsg());
             }
         } catch(const std::exception &e) {
-            std::cerr << "exception occured! <" << e.what() << ">" << std::endl;
+            screen.printException(e.what());
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
@@ -77,6 +77,9 @@ void MessageLoop::parseLayout(const LayoutGetLayoutsRes_Derived &d) {
 
     blockMap = parser.getBlockMap();
     switchMap = parser.getSwitchMap();
+
+    screen.setBlocks(blockMap);
+    updateScreen();
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
@@ -99,4 +102,10 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
 
     // vorherigen Block freigeben:
     //endpoint->sendMsg(ControlUnlockBlock{1, 1});
+
+    updateScreen();
+}
+
+void MessageLoop::updateScreen() {
+    screen.draw();
 }
