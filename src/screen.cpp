@@ -20,12 +20,10 @@
 
 #include "screen.h"
 #include <curses.h>
+#include <iostream>
+#include <unordered_set>
 
-Screen::Screen(const BlockNodeMapPtr &blocks): blocks{blocks} {
-    for(auto const& [_, v]: *blocks) {
-        nodesFound[v->getId()] = false;
-    }
-    
+Screen::Screen() {
     initscr();
     curs_set(0);
     noecho();
@@ -38,15 +36,30 @@ Screen::Screen(const BlockNodeMapPtr &blocks): blocks{blocks} {
     init_pair(1, COLOR_RED,   COLOR_BLACK);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
     
-    init();
 }
 
 Screen::~Screen() {
     endwin();
 }
 
+void Screen::setBlocks(const BlockNodeMapPtr &blocks) {
+    for(auto const& [_, v]: *blocks) {
+        nodesFound[v->getId()] = false;
+    }
+
+    this->blocks = blocks;
+    init();
+}
+
 void Screen::init() {
+    /*
+    if(!blocks) { FIXME: throw exceptin at this point
+        throw 
+    }
+     */
+    
     digit = !digit;
+    chainList.clear();
     
     for(auto const& [_, v]: *blocks) {
         auto id = v->getId();
@@ -54,79 +67,97 @@ void Screen::init() {
         if(nodesFound[id] == digit) {
             continue;
         }
-       
         buildChain(v);
-
-        nodesFound[id] = digit;
     }
 }
 
-void Screen::buildChain(NodePtr node) {
+void Screen::buildChain(NodePtr origin) {
 
-    Chain   chain;
-    NodePtr tmp = node;
+    Chain chain;
+
+    NodePtr next = origin->getJunctionNode(Direction::RIGHT);
     
-    while(true) {
-        if(!tmp) {
-           break; 
-        }
-        
-        chain.list.push_back(tmp);
-        
-        tmp = node->getJunctionNode(Direction::RIGHT);
-
-        
-    }    
-   
+    nodesFound[origin->getId()] = digit;
+    chain.list.push_back(origin);
+    addChainLink(origin, next, chain);
+       
     chainList.push_back(std::move(chain));
 }
 
-void Screen::draw() {
+void Screen::addChainLink(NodePtr origin, NodePtr next, Chain &chain) {
+    NodePtr start = origin;
     
+    while(true) {
+        if(!next) {
+            if(chain.isOpen) {
+                return;
+            }
+            // Hier noch in andere Richtung suchen
+            chain.isOpen = true;
+            next = start->getJunctionNode(Direction::LEFT);
+
+            addChainLink(start, next, chain);
+            return; 
+        }
+        
+        if(chain.isOpen) {
+            chain.list.push_front(next);
+        } else {
+            chain.list.push_back(next);
+        }
+        nodesFound[next->getId()] = digit;
+
+        auto tmp = next;
+        next = next->getJunctionNode(origin);
+        origin = tmp;
+        
+        if(next == start) {
+            return;
+        }
+    }    
 }
 
+void Screen::draw() {
+    int y = 2;
+    int x = 1;
+    clear();
+    for(auto const& v: chainList) {
+        mvprintw(y * 3, 0, (v.isOpen ? "%2i) [open]" : "%2i) [closed]"), y);
+        
+        for(auto const& a: v.list) {
+            auto block = std::dynamic_pointer_cast<Block>(a);
+            if(x != 1) {
+                mvprintw(y * 3, x * 12 - 2, "->");
+            } 
+            if(block) {
+                mvprintw(y * 3, x * 12, " |B:%4d| ", a->getId());
+            } else {
+                mvprintw(y * 3, x * 12, " |S:%4d| ", a->getId());
+            }
 
-
-/*
-void Screen::drawBlock(int i, const ContactData &contact, std::shared_ptr<Block> block) {
-
-    auto in = block->getNextBlockInDirection();
-    auto out = block->getNextBlockOutDirection();
-    auto train = block->getTrain();
-
-    mvprintw(i, 0, "#%d Block %d   R %d/%d", i, block->getId(), contact.modulAddr, contact.contactNb);
-    if(out) {
-        mvprintw(i, 27, "[%d] >>>>", out->getId());
-    } else {
-        mvprintw(i, 27, "[---] >>>>");
+            if(block && block->isBlocked()) {
+                auto train = block->getTrain();
+                if(train->direction.drivingDirection == DrivingDirection::BACKWARD) {
+                    mvprintw(y * 3 + 1, x * 12, " |#%5d| >>", train->address);
+                } else {
+                    mvprintw(y * 3 + 1, x * 12 - 2, "<< |#%5d|", train->address);
+                }
+            }
+            x++;
+        }
+        y++;
+        x = 1;
+        refresh();
     }
+}
 
-    if(train) {
-        mvprintw(i, 37, ">>>> [%d] >>>>", train->localId);
-    } else {
-        mvprintw(i, 37, ">>>> [-----] >>>>");
-    }
-
-    if(in) {
-        mvprintw(i, 54, ">>>> [%d]", in->getId());
-    } else {
-        mvprintw(i, 54, ">>>> [---]");
-    }
-
+void Screen::printException(const std::string& txt) {
+    attrset(COLOR_PAIR(1)); // red
+    mvprintw(0, 0, ">> exception occured! <%s>", txt.c_str());
+    attrset(COLOR_PAIR(0));
     refresh();
 }
 
-void Screen::printLine(const std::string &notice) {
-    if(ignore) {
-        return;
-    }
-
-    mvprintw(11, 0, "                                                                      ");
-    mvprintw(11, 0, "%s", notice.c_str());
-}
-
-/ *
-    attrset(COLOR_PAIR(0));
+/*
     attrset(COLOR_PAIR(2)); // green
-    attrset(COLOR_PAIR(1)); // red
  */

@@ -24,29 +24,32 @@
 #include <map>
 #include <list>
 #include <vector>
+#include <memory>
+#include <string>
 
 class Screen {
 public:
-    Screen(const BlockNodeMapPtr &blocks);
+    Screen();
     
     virtual ~Screen();
 
+    void setBlocks(const BlockNodeMapPtr &blocks);
     void init();
-    void buildChain(NodePtr node);
     void draw();
+    void printException(const std::string &txt);
     
 private:
     std::map<int, bool> nodesFound;
     BlockNodeMapPtr     blocks;
-    bool                digit{true};
+    bool                digit{false};
     
     struct Chain {
-        bool isOpen;
+        bool isOpen{false};
         std::list<NodePtr> list;    
     };
     
     std::vector<Chain> chainList;
-    
+
+    void buildChain(NodePtr origin);
+    void addChainLink(NodePtr origin, NodePtr next, Chain &chain);    
 };
-
-
