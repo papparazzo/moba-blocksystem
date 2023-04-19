@@ -25,7 +25,7 @@
 #include <memory>
 
 #include "moba/direction.h"
-#include "moba/switchstand.h"
+#include "moba/enumswitchstand.h"
 
 class NodeException: public std::exception {
 
