@@ -27,8 +27,7 @@ struct SimpleSwitch: public Node {
 
     using Node::Node;
 
-    virtual ~SimpleSwitch() {
-    }
+    virtual ~SimpleSwitch() noexcept = default;
 
     void setJunctionNode(Direction dir, NodePtr node) {
         switch(dir) {
@@ -87,4 +86,3 @@ protected:
     NodePtr outStraight;
     NodePtr outBend;
 };
-

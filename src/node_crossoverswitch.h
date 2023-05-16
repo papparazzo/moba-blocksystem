@@ -27,8 +27,7 @@ struct CrossOverSwitch: public Node {
 
     using Node::Node;
 
-    virtual ~CrossOverSwitch() {
-    }
+    virtual ~CrossOverSwitch() noexcept = default;
 
     void setJunctionNode(Direction dir, NodePtr node) {
         switch(dir) {

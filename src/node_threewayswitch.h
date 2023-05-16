@@ -27,8 +27,7 @@ struct ThreeWaySwitch: public Node {
 
     using Node::Node;
 
-    virtual ~ThreeWaySwitch() {
-    }
+    virtual ~ThreeWaySwitch() noexcept = default;
 
     void setJunctionNode(Direction dir, NodePtr node) {
         switch(dir) {

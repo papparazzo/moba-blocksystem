@@ -53,7 +53,7 @@ struct Node {
     Node(unsigned int id, SwitchStand switchStand = SwitchStand::STRAIGHT_1): id{id}, currentState{switchStand} {
     }
 
-    virtual ~Node() {};
+    virtual ~Node() noexcept = default;
     virtual NodePtr getJunctionNode(NodePtr node) const = 0;
     virtual NodePtr getJunctionNode(Direction dir) const = 0;
     virtual void setJunctionNode(Direction dir, NodePtr node) = 0;
