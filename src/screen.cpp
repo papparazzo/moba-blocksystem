@@ -125,7 +125,7 @@ void Screen::draw() {
         mvprintw(y * 3, 0, (v.isOpen ? "%2i) [open]" : "%2i) [closed]"), y);
         
         for(auto const& a: v.list) {
-            auto block = std::dynamic_pointer_cast<Block>(a);
+            auto block = std::dynamic_pointer_cast<BlockExt>(a);
             if(x != 1) {
                 mvprintw(y * 3, x * 12 - 2, "->");
             } 

@@ -22,7 +22,7 @@
 #include <memory>
 
 #include "layoutparser.h"
-#include "node_block.h"
+#include "node_block_ext.h"
 #include "node_crossoverswitch.h"
 #include "node_threewayswitch.h"
 #include "node_simpleswitch.h"
@@ -187,10 +187,10 @@ void LayoutParser::parse(LayoutContainerPtr layout, BlockContactDataMapPtr block
     fetchBlockNodes(dir2, pos);
 }
 
-BlockPtr LayoutParser::createBlock(int id, BlockContactDataPtr contact) {
+BlockExtPtr LayoutParser::createBlock(int id, BlockContactDataPtr contact) {
     // get train from block and set it
     auto iter = trainList->find(contact->trainId);
-    auto block = std::make_shared<Block>(id);
+    auto block = std::make_shared<BlockExt>(id);
 
     if(iter != trainList->end()) {
         block->setTrain(iter->second);

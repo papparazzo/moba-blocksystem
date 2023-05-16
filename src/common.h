@@ -30,7 +30,7 @@
 #include "moba/position.h"
 #include "moba/shared.h"
 #include "node.h"
-#include "node_block.h"
+#include "node_block_ext.h"
 
 // In
 struct LayoutSymbol {
@@ -48,4 +48,4 @@ using SwitchStandMapPtr = std::shared_ptr<std::map<Position, SwitchStandData>>;
 
 // Out
 using SwitchNodeMapPtr = std::shared_ptr<std::map<int, NodePtr>>;
-using BlockNodeMapPtr = std::shared_ptr<std::map<ContactData, BlockPtr>>;
+using BlockNodeMapPtr = std::shared_ptr<std::map<ContactData, BlockExtPtr>>;

@@ -32,16 +32,12 @@ struct Block;
 
 using BlockPtr = std::shared_ptr<Block>;
 
-struct Block: public Node, std::enable_shared_from_this<Node> {
+struct Block: public Node {
 
     Block(unsigned int id): Node{id} {
     }
 
-    Block(unsigned int id, TrainPtr train): Node{id}, train{train} {
-    }
-
-    virtual ~Block() {
-    }
+    virtual ~Block() noexcept = default;
 
     void setJunctionNode(Direction dir, NodePtr node) {
         switch(dir) {
@@ -89,76 +85,7 @@ struct Block: public Node, std::enable_shared_from_this<Node> {
         throw NodeException{"invalid direction given!"};
     }
     
-    bool isOut(NodePtr b) const {
-        return b == out;
-    }
-
-    bool isBlocked() const {
-        return (bool)train;
-    }
-
-    TrainPtr getTrain() const {
-        return train;
-    }
-
-    void setTrain(TrainPtr train) {
-        this->train = train;
-    }
-
-    BlockPtr pushTrain() {
-        if(!isBlocked()) {
-            throw NodeException{"block not blocked!"};
-        }
-
-        BlockPtr nextBlock;
-
-        if(train->direction.drivingDirection == DrivingDirection::FORWARD) {
-            nextBlock = getNextBlock(out);
-        } else {
-            nextBlock = getNextBlock(in);
-        }
-
-        if(nextBlock) {
-            nextBlock->setTrain(train);
-            train = TrainPtr();
-        }
-        return nextBlock;
-    }
-
 protected:
     NodePtr in;
     NodePtr out;
-
-    TrainPtr train;
-
-    BlockPtr getNextBlock(NodePtr nextNode) {
-        if(!nextNode) {
-            return BlockPtr{};
-        }
-
-        auto curNode = shared_from_this();
-
-        while(auto afterNextNode = nextNode->getJunctionNode(curNode)) {
-            auto nextBlock = std::dynamic_pointer_cast<Block>(nextNode);
-            if(nextBlock) {
-                if(nextBlock->isBlocked() ) {
-                    return BlockPtr{};
-                }
-                
-                if(!train) {
-                    return nextBlock;
-                }
-                if(nextBlock->isOut(curNode)) {
-                    train->direction.drivingDirection = DrivingDirection::BACKWARD;
-                } else {
-                    train->direction.drivingDirection = DrivingDirection::FORWARD;
-                }
-                return nextBlock;
-            }
-            curNode = nextNode;
-            nextNode = afterNextNode;
-        }
-        return BlockPtr{};
-    }
 };
-

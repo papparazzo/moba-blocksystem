@@ -73,12 +73,12 @@ class LayoutParser {
     std::map<Position, NodeJunctions> nodes;
 
     void fetchBlockNodes(Direction dir, Position pos);
-    BlockPtr createBlock(int id, BlockContactDataPtr contact);
+    BlockExtPtr createBlock(int id, BlockContactDataPtr contact);
 
 public:
     LayoutParser() {
         switcheNodeMap = std::make_shared<std::map<int, std::shared_ptr<Node>>>();
-        blockNodeMap = std::make_shared<std::map<ContactData, std::shared_ptr<Block>>>();
+        blockNodeMap = std::make_shared<std::map<ContactData, std::shared_ptr<BlockExt>>>();
     }
 
     virtual ~LayoutParser(){
