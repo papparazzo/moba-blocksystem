@@ -137,7 +137,7 @@ void Screen::draw() {
 
             if(block && block->isBlocked()) {
                 auto train = block->getTrain();
-                if(train->direction.drivingDirection == DrivingDirection::BACKWARD) {
+                if(train->direction.drivingDirection == moba::DrivingDirection::BACKWARD) {
                     mvprintw(y * 3 + 1, x * 12, " |#%5d| >>", train->address);
                 } else {
                     mvprintw(y * 3 + 1, x * 12 - 2, "<< |#%5d|", train->address);

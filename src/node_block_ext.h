@@ -23,9 +23,8 @@
 #include <memory>
 #include <cassert>
 
-#include "node.h"
-#include "node_block.h"
-#include "moba/driving_direction.h"
+#include "moba/node.h"
+#include "moba/node_block.h"
 #include "moba/direction.h"
 #include "moba/train.h"
 
@@ -65,7 +64,7 @@ struct BlockExt: public Block, std::enable_shared_from_this<Node> {
 
         BlockExtPtr nextBlock;
 
-        if(train->direction.drivingDirection == DrivingDirection::FORWARD) {
+        if(train->direction.drivingDirection == moba::DrivingDirection::FORWARD) {
             nextBlock = getNextBlock(out);
         } else {
             nextBlock = getNextBlock(in);
@@ -100,9 +99,9 @@ protected:
                     return nextBlock;
                 }
                 if(nextBlock->isOut(curNode)) {
-                    train->direction.drivingDirection = DrivingDirection::BACKWARD;
+                    train->direction.drivingDirection = moba::DrivingDirection::BACKWARD;
                 } else {
-                    train->direction.drivingDirection = DrivingDirection::FORWARD;
+                    train->direction.drivingDirection = moba::DrivingDirection::FORWARD;
                 }
                 return nextBlock;
             }
@@ -112,4 +111,3 @@ protected:
         return BlockExtPtr{};
     }
 };
-
