@@ -23,7 +23,7 @@
 #include <map>
 #include <exception>
 
-#include "node.h"
+#include "moba/node.h"
 #include "moba/position.h"
 #include "moba/container.h"
 #include "moba/symbol.h"

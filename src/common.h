@@ -24,12 +24,14 @@
 #include <vector>
 #include <map>
 
+#include <moba-common/enumswitchstand.h>
+
 #include "moba/train.h"
 #include "moba/symbol.h"
 #include "moba/container.h"
 #include "moba/position.h"
 #include "moba/shared.h"
-#include "node.h"
+#include "moba/node.h"
 #include "node_block_ext.h"
 
 // In

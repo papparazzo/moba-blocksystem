@@ -23,9 +23,9 @@
 
 #include "layoutparser.h"
 #include "node_block_ext.h"
-#include "node_crossoverswitch.h"
-#include "node_threewayswitch.h"
-#include "node_simpleswitch.h"
+#include "moba/node_crossoverswitch.h"
+#include "moba/node_threewayswitch.h"
+#include "moba/node_simpleswitch.h"
 #include "moba/shared.h"
 #include <cassert>
 
