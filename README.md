@@ -7,14 +7,14 @@ sudo apt-get install libtool # see https://stackoverflow.com/questions/18978252/
 
 
 ```sh
-git submodule init  
-git submodule update  
+git submodule init
+git submodule update
 ```
 
 ---
 
 ```sh
-autoreconf -i  
+autoreconf -i
 ./configure && make 
-sudo make install  
+sudo make install
 ```
