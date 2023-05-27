@@ -33,22 +33,21 @@
 #include <functional>
 
 class LayoutParserException: public std::exception {
-    public:
-        explicit LayoutParserException(const std::string &err) throw() : what_{err} {
-        }
 
-        LayoutParserException() throw() : what_{"Unknown error"} {
-        }
+    std::string what_;
+    
+public:
+    explicit LayoutParserException(const std::string &err) noexcept: what_{err} {
+    }
 
-        virtual ~LayoutParserException() throw() {
-        }
+    LayoutParserException() noexcept: what_{"Unknown error"} {
+    }
 
-        virtual const char *what() const throw() {
-            return this->what_.c_str();
-        }
+    virtual ~LayoutParserException() noexcept = default;
 
-    private:
-        std::string what_;
+    virtual const char *what() const noexcept {
+        return this->what_.c_str();
+    }
 };
 
 class LayoutParser {
