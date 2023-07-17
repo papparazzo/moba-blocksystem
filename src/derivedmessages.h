@@ -40,7 +40,7 @@ struct LayoutGetLayoutsRes_Derived: public LayoutMessage {
         }
     }
 
-    LayoutContainerPtr symbols;
+    LayoutContainerPtr symbols{};
 };
 
 struct ControlGetBlockListRes: public ControlMessage {
