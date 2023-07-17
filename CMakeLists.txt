@@ -11,6 +11,9 @@ add_executable(
     moba-blocksystem
 
     src/main.cpp
+    src/msgloop.cpp
+    src/layoutparser.cpp
+    src/screen.cpp
 )
 
 install(TARGETS moba-blocksystem)
@@ -20,9 +23,11 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 target_include_directories(moba-blocksystem PUBLIC "${PROJECT_BINARY_DIR}")
 
 target_link_libraries(moba-blocksystem mobacommon)
-target_link_libraries(moba-blocksystem ${CMAKE_SOURCE_DIR}/modules/lib-msghandling/src/moba/libmsghandling.a)
+target_link_libraries(moba-blocksystem ${CMAKE_SOURCE_DIR}/modules/lib-msghandling/libmoba-lib-msghandling.a)
+target_link_libraries(moba-blocksystem ${CMAKE_SOURCE_DIR}/modules/lib-tracklayout/libmoba-lib-tracklayout.a)
 
 include_directories(${CMAKE_SOURCE_DIR}/modules/lib-msghandling/src)
+include_directories(${CMAKE_SOURCE_DIR}/modules/lib-tracklayout/src)
 
 #AM_CPPFLAGS = \
 #    $(GTKMM_CFLAGS) \
