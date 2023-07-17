@@ -18,7 +18,6 @@
  *
  */
 
-#include <iostream>
 #include <functional>
 #include <memory>
 #include <thread>

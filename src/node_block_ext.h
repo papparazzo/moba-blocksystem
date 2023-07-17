@@ -41,20 +41,20 @@ struct BlockExt: public Block, std::enable_shared_from_this<Node> {
 
     virtual ~BlockExt() noexcept = default;
 
-    bool isOut(NodePtr b) const {
+    [[nodiscard]] bool isOut(NodePtr b) const {
         return b == out;
     }
 
-    bool isBlocked() const {
+    [[nodiscard]] bool isBlocked() const {
         return (bool)train;
     }
 
-    TrainPtr getTrain() const {
+    [[nodiscard]] TrainPtr getTrain() const {
         return train;
     }
 
     void setTrain(TrainPtr train) {
-        this->train = train;
+        this->train = std::move(train);
     }
 
     BlockExtPtr pushTrain() {
