@@ -27,15 +27,15 @@
 struct LayoutGetLayoutsRes_Derived: public LayoutMessage {
     static constexpr std::uint32_t MESSAGE_ID = LAYOUT_GET_LAYOUT_RES;
 
-    LayoutGetLayoutsRes_Derived(const rapidjson::Document &d) {
+    explicit LayoutGetLayoutsRes_Derived(const nlohmann::json &d) {
         symbols = std::make_shared<Container<SymbolPtr>>();
-        for(auto &iter: d["symbols"].GetArray()) {
+        for(auto &iter: d["symbols"]) {
             symbols->addItem(
                 {
-                    static_cast<std::size_t>(iter["xPos"].GetInt()),
-                    static_cast<std::size_t>(iter["yPos"].GetInt())
+                    static_cast<std::size_t>(iter["xPos"].get<int>()),
+                    static_cast<std::size_t>(iter["yPos"].get<int>())
                 },
-                std::make_shared<LayoutSymbol>(iter["id"].GetInt(), iter["symbol"].GetInt())
+                std::make_shared<LayoutSymbol>(iter["id"].get<int>(), iter["symbol"].get<int>())
             );
         }
     }
@@ -46,13 +46,13 @@ struct LayoutGetLayoutsRes_Derived: public LayoutMessage {
 struct ControlGetBlockListRes: public ControlMessage {
     static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_BLOCK_LIST_RES;
 
-    ControlGetBlockListRes(const rapidjson::Document &d) {
+    explicit ControlGetBlockListRes(const nlohmann::json &d) {
         blockContacts = std::make_shared<std::map<Position, BlockContactDataPtr>>();
 
-        for(auto &iter : d.GetArray()) {
+        for(auto &iter : d) {
             (*blockContacts)[{
-                static_cast<std::size_t>(iter["xPos"].GetInt()),
-                static_cast<std::size_t>(iter["yPos"].GetInt())
+                static_cast<std::size_t>(iter["xPos"].get<int>()),
+                static_cast<std::size_t>(iter["yPos"].get<int>())
             }] = std::make_shared<BlockContactData>(iter);
         }
     }
@@ -62,13 +62,13 @@ struct ControlGetBlockListRes: public ControlMessage {
 
 struct ControlGetSwitchStandListRes: public ControlMessage {
     static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_SWITCH_STAND_LIST_RES;
-    ControlGetSwitchStandListRes(const rapidjson::Document &d) {
+    explicit ControlGetSwitchStandListRes(const nlohmann::json &d) {
         switchstates = std::make_shared<std::map<Position, SwitchStandData>>();
 
-        for(auto &iter : d.GetArray()) {
+        for(auto &iter : d) {
             (*switchstates)[{
-                static_cast<std::size_t>(iter["xPos"].GetInt()),
-                static_cast<std::size_t>(iter["yPos"].GetInt())
+                static_cast<std::size_t>(iter["xPos"].get<int>()),
+                static_cast<std::size_t>(iter["yPos"].get<int>())
             }] = SwitchStandData{iter};
         }
     }
