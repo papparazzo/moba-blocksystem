@@ -19,7 +19,6 @@
  */
 
 #include <thread>
-#include <moba-common/log.h>
 
 #include "msgloop.h"
 #include "moba/registry.h"
