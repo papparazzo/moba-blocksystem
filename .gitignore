@@ -48,14 +48,13 @@ nbproject/
 /configure.scan
 /autoscan.log
 /response.log
-/src/moba-blocksystem
+moba-blocksystem
 /src/.deps/
 core
 
 # misc
 .deps/
 .dirstamp
-*.o
 *~
 !.gitkeep
 
