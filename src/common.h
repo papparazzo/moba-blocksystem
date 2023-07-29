@@ -36,7 +36,7 @@
 
 // In
 struct LayoutSymbol {
-    LayoutSymbol(int id, Symbol symbol): id{id}, symbol{symbol} {
+    LayoutSymbol(int id, const Symbol& symbol): id{id}, symbol{symbol} {
     }
 	int id;
 	Symbol symbol;

@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <cassert>
+#include <utility>
 
 #include "moba/node.h"
 #include "moba/node_block.h"
@@ -36,12 +37,12 @@ struct BlockExt: public Block, std::enable_shared_from_this<Node> {
 
     using Block::Block;
     
-    BlockExt(unsigned int id, TrainPtr train): Block{id}, train{train} {
+    BlockExt(unsigned int id, TrainPtr train): Block{id}, train{std::move(train)} {
     }
 
-    virtual ~BlockExt() noexcept = default;
+    ~BlockExt() noexcept override = default;
 
-    [[nodiscard]] bool isOut(NodePtr b) const {
+    [[nodiscard]] bool isOut(const NodePtr& b) const {
         return b == out;
     }
 
