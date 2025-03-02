@@ -18,9 +18,7 @@
  *
  */
 
-#include <functional>
 #include <memory>
-#include <thread>
 
 #include <moba-common/helper.h>
 
