@@ -24,6 +24,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 target_include_directories(moba-blocksystem PUBLIC "${PROJECT_BINARY_DIR}")
 
 target_link_libraries(moba-blocksystem mobacommon)
+target_link_libraries(moba-blocksystem ncurses)
 target_link_libraries(moba-blocksystem ${CMAKE_SOURCE_DIR}/modules/lib-msghandling/libmoba-lib-msghandling.a)
 target_link_libraries(moba-blocksystem ${CMAKE_SOURCE_DIR}/modules/lib-tracklayout/libmoba-lib-tracklayout.a)
 
