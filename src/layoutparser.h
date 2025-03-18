@@ -80,16 +80,15 @@ public:
         blockNodeMap = std::make_shared<std::map<ContactData, std::shared_ptr<BlockExt>>>();
     }
 
-    virtual ~LayoutParser(){
-    }
+    virtual ~LayoutParser()= default;
 
     void parse(LayoutContainerPtr layout, BlockContactDataMapPtr blockContacts, SwitchStandMapPtr switchstates, TrainListPtr trainList);
 
-    SwitchNodeMapPtr getSwitchMap() const {
+    [[nodiscard]] SwitchNodeMapPtr getSwitchMap() const {
         return switcheNodeMap;
     }
 
-    BlockNodeMapPtr getBlockMap() const {
+    [[nodiscard]] BlockNodeMapPtr getBlockMap() const {
         return blockNodeMap;
     }
 };
