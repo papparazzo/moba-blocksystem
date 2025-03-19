@@ -35,7 +35,7 @@ Screen::Screen() {
     start_color();
     init_pair(1, COLOR_RED,   COLOR_BLACK);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    
+
 }
 
 Screen::~Screen() {
@@ -57,7 +57,7 @@ void Screen::init() {
         throw 
     }
      */
-    
+
     digit = !digit;
     chainList.clear();
     
@@ -114,7 +114,7 @@ void Screen::addChainLink(NodePtr origin, NodePtr next, Chain &chain) {
         if(next == start) {
             return;
         }
-    }    
+    }
 }
 
 void Screen::draw() {

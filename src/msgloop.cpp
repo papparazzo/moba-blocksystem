@@ -97,7 +97,9 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
     auto block = iter->second->pushTrain();
     auto train = block->getTrain();
 
-    endpoint->sendMsg(ControlPushTrain{train->id, iter->second->getId(), block->getId(), train->direction});
+    endpoint->sendMsg(
+        ControlPushTrain{train->id, iter->second->getId(), block->getId(), train->direction}
+    );
 
     // vorherigen Block freigeben:
     //endpoint->sendMsg(ControlUnlockBlock{1, 1});
