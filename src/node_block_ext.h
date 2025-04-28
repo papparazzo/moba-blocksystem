@@ -60,7 +60,9 @@ struct BlockExt: public Block, std::enable_shared_from_this<Node> {
 
     BlockExtPtr pushTrain() {
         if(!isBlocked()) {
-            throw NodeException{"block not blocked!"};
+            std::stringstream ss;
+            ss << "block <" << id << "> not blocked!";
+            throw NodeException{ss.str()};
         }
 
         BlockExtPtr nextBlock;
