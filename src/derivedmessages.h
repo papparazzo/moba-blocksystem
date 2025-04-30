@@ -24,7 +24,7 @@
 #include "moba/controlmessages.h"
 #include "common.h"
 
-struct LayoutGetLayoutsRes_Derived: public LayoutMessage {
+struct LayoutGetLayoutsRes_Derived final : LayoutMessage {
     static constexpr std::uint32_t MESSAGE_ID = LAYOUT_GET_LAYOUT_RES;
 
     explicit LayoutGetLayoutsRes_Derived(const nlohmann::json &d) {
@@ -43,7 +43,7 @@ struct LayoutGetLayoutsRes_Derived: public LayoutMessage {
     LayoutContainerPtr symbols{};
 };
 
-struct ControlGetBlockListRes: public ControlMessage {
+struct ControlGetBlockListRes final : ControlMessage {
     static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_BLOCK_LIST_RES;
 
     explicit ControlGetBlockListRes(const nlohmann::json &d) {
@@ -60,7 +60,7 @@ struct ControlGetBlockListRes: public ControlMessage {
     BlockContactDataMapPtr blockContacts;
 };
 
-struct ControlGetSwitchStandListRes: public ControlMessage {
+struct ControlGetSwitchStandListRes final : ControlMessage {
     static constexpr std::uint32_t MESSAGE_ID = CONTROL_GET_SWITCH_STAND_LIST_RES;
     explicit ControlGetSwitchStandListRes(const nlohmann::json &d) {
         switchstates = std::make_shared<std::map<Position, SwitchStandData>>();
