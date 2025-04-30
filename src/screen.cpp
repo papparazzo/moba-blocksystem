@@ -25,6 +25,7 @@
 
 Screen::Screen() {
     initscr();
+    use_default_colors();
     curs_set(0);
     noecho();
 
@@ -122,7 +123,7 @@ void Screen::draw() {
     int x = 1;
     clear();
     for(auto const& v: chainList) {
-        mvprintw(y * 3, 0, (v.isOpen ? "%2i) [open]" : "%2i) [closed]"), y);
+        mvprintw(y * 3, 0, (v.isOpen ? "#%2i [open]" : "%2i) [closed]"), y - 1);
         
         for(auto const& a: v.list) {
             auto block = std::dynamic_pointer_cast<BlockExt>(a);
@@ -152,9 +153,16 @@ void Screen::draw() {
 }
 
 void Screen::printException(const std::string& txt) {
-    attrset(COLOR_PAIR(1)); // red
-    mvprintw(0, 0, ">> exception occured! <%s>", txt.c_str());
+    attrset(COLOR_PAIR(1));
+    mvprintw(0, 4, "Exception: %s", txt.c_str());
     attrset(COLOR_PAIR(0));
+    refresh();
+}
+
+void Screen::printStatus(const std::string &txt) {
+    attrset(COLOR_PAIR(COLOR_RED));
+    mvprintw(1, 4, "Status: %s", txt.c_str());
+    attrset(COLOR_PAIR(1));
     refresh();
 }
 

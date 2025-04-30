@@ -94,8 +94,8 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
         return;
     }
 
-    auto block = iter->second->pushTrain();
-    auto train = block->getTrain();
+    const auto block = iter->second->pushTrain();
+    const auto train = block->getTrain();
 
     endpoint->sendMsg(
         ControlPushTrain{train->id, iter->second->getId(), block->getId(), train->direction}

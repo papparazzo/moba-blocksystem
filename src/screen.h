@@ -27,16 +27,17 @@
 #include <memory>
 #include <string>
 
-class Screen {
+class Screen final {
 public:
     Screen();
-    
-    virtual ~Screen();
+
+    ~Screen();
 
     void setBlocks(const BlockNodeMapPtr &blocks);
     void init();
     void draw();
     void printException(const std::string &txt);
+    void printStatus(const std::string &txt);
     
 private:
     std::map<int, bool> nodesFound;

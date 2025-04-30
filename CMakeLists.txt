@@ -19,8 +19,6 @@ add_executable(
 
 install(TARGETS moba-blocksystem)
 
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-
 target_include_directories(moba-blocksystem PUBLIC "${PROJECT_BINARY_DIR}")
 
 target_link_libraries(moba-blocksystem mobacommon)
