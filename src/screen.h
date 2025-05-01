@@ -45,6 +45,10 @@ private:
     bool                digit{false};
     
     struct Chain {
+        /**
+         * Gibt an, ob die Kette offen ist (z.B. falsch gestellte Weiche, Prellbock...) bei einer geschlossenen Kette
+         * kann der Zug einmal im Kreis fahren...
+         */
         bool isOpen{false};
         std::list<NodePtr> list;    
     };

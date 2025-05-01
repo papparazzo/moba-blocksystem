@@ -123,7 +123,7 @@ void Screen::draw() {
     int x = 1;
     clear();
     for(auto const& v: chainList) {
-        mvprintw(y * 3, 0, (v.isOpen ? "#%2i [open]" : "%2i) [closed]"), y - 1);
+        mvprintw(y * 3, 0, (v.isOpen ? "%2i) [open]" : "%2i) [closed]"), y-1);
         
         for(auto const& a: v.list) {
             auto block = std::dynamic_pointer_cast<BlockExt>(a);
@@ -138,6 +138,7 @@ void Screen::draw() {
 
             if(block && block->isBlocked()) {
                 auto train = block->getTrain();
+
                 if(train->direction.drivingDirection == moba::DrivingDirection::BACKWARD) {
                     mvprintw(y * 3 + 1, x * 12, " |#%5d| >>", train->address);
                 } else {

@@ -29,8 +29,6 @@
 #include "moba/layoutmessages.h"
 #include "msgloop.h"
 
-#include <unistd.h>
-
 namespace {
     moba::AppData appData = {
         PACKAGE_NAME,
