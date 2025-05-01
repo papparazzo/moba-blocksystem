@@ -46,7 +46,11 @@ void MessageLoop::run() {
             endpoint->sendMsg(ControlGetBlockListReq{});
 
             while(true) {
-                registry.handleMsg(endpoint->waitForNewMsg());
+                try {
+                    registry.handleMsg(endpoint->waitForNewMsg());
+                } catch(const std::exception &e) {
+                    screen.printException(e.what());
+                }
             }
         } catch(const std::exception &e) {
             screen.printException(e.what());
@@ -82,10 +86,20 @@ void MessageLoop::parseLayout(const LayoutGetLayoutsRes_Derived &d) {
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
+    if (!blockMap) {
+        // TODO Initialisierung schlug offenbar fehl!
+    }
+
     // Nur belegte Bloecke beruecksichtigen
     if(!d.contactTrigger.state) {
         return;
     }
+
+    std::stringstream ss;
+    ss <<
+        "Contact triggered: <" << d.contactTrigger.contactData.moduleAddr <<
+        ":" << d.contactTrigger.contactData.contactNb << ">";
+    screen.printStatus(ss.str());
 
     auto iter = blockMap->find(d.contactTrigger.contactData);
 
@@ -94,6 +108,14 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
         return;
     }
 
+    std::stringstream ss1;
+    ss1 <<
+        "Contact triggered: <" << d.contactTrigger.contactData.moduleAddr <<
+        ":" << d.contactTrigger.contactData.contactNb << "> [" <<
+        "Block Id:" << iter->second->getId() << "]";
+    screen.printStatus(ss1.str());
+
+    //return;
     const auto block = iter->second->pushTrain();
     const auto train = block->getTrain();
 
