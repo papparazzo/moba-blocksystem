@@ -25,7 +25,8 @@
 #include "moba/controlmessages.h"
 #include "layoutparser.h"
 
-MessageLoop::MessageLoop(EndpointPtr endpoint): endpoint{endpoint}, closing{false} {
+MessageLoop::MessageLoop(EndpointPtr endpoint, MonitorPtr monitor):
+endpoint{endpoint}, monitor{monitor}, closing{false} {
 }
 
 void MessageLoop::run() {
@@ -41,19 +42,17 @@ void MessageLoop::run() {
             //registry.registerHandler<ControlBlockLocked>([this](const ControlBlockLocked &d) {});
             //registry.registerHandler<ControlBlockLockingFailed>([this](const ControlBlockLockingFailed &d) {});
             registry.registerHandler<LayoutDefaultLayoutChanged>([this](const LayoutDefaultLayoutChanged &d) {endpoint->sendMsg(ControlGetBlockListReq{});});
+            registry.registerHandler<SystemHardwareStateChanged>(std::bind(&MessageLoop::setHardwareState, this, std::placeholders::_1));
 
             endpoint->connect();
+            endpoint->sendMsg(SystemGetHardwareState{});
             endpoint->sendMsg(ControlGetBlockListReq{});
 
             while(true) {
-                try {
-                    registry.handleMsg(endpoint->waitForNewMsg());
-                } catch(const std::exception &e) {
-                    screen.printException(e.what());
-                }
+                registry.handleMsg(endpoint->waitForNewMsg());
             }
         } catch(const std::exception &e) {
-            screen.printException(e.what());
+            monitor->printException("MessageLoop::run()", e.what());
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{500});
     }
@@ -81,8 +80,8 @@ void MessageLoop::parseLayout(const LayoutGetLayoutsRes_Derived &d) {
     blockMap = parser.getBlockMap();
     switchMap = parser.getSwitchMap();
 
-    screen.setBlocks(blockMap);
-    updateScreen();
+    monitor->setBlocks(blockMap);
+    monitor->draw();
 }
 
 void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
@@ -99,7 +98,7 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
     ss <<
         "Contact triggered: <" << d.contactTrigger.contactData.moduleAddr <<
         ":" << d.contactTrigger.contactData.contactNb << ">";
-    screen.printStatus(ss.str());
+   // screen.printStatus(ss.str());
 
     auto iter = blockMap->find(d.contactTrigger.contactData);
 
@@ -113,7 +112,7 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
         "Contact triggered: <" << d.contactTrigger.contactData.moduleAddr <<
         ":" << d.contactTrigger.contactData.contactNb << "> [" <<
         "Block Id:" << iter->second->getId() << "]";
-    screen.printStatus(ss1.str());
+   // screen.printStatus(ss1.str());
 
     //return;
     const auto block = iter->second->pushTrain();
@@ -126,9 +125,9 @@ void MessageLoop::contactTriggered(const InterfaceContactTriggered &d) {
     // vorherigen Block freigeben:
     //endpoint->sendMsg(ControlUnlockBlock{1, 1});
 
-    updateScreen();
+        monitor->draw();
 }
 
-void MessageLoop::updateScreen() {
-    screen.draw();
+void MessageLoop::setHardwareState(SystemHardwareStateChanged &&data) const{
+    monitor->printStatus(data.hardwareState);
 }

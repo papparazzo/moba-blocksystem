@@ -23,15 +23,17 @@
 #include <memory>
 
 #include "derivedmessages.h"
-#include "screen.h"
+#include <moba-common/screen.h>
 #include "moba/interfacemessages.h"
 #include "moba/endpoint.h"
 #include "moba/train.h"
 #include "common.h"
+#include "monitor.h"
 
 class MessageLoop {
     
     EndpointPtr endpoint;
+    MonitorPtr monitor;
 
     // in
     BlockContactDataMapPtr blockContacts;
@@ -43,18 +45,16 @@ class MessageLoop {
     SwitchNodeMapPtr switchMap;
 
     bool closing;
-    Screen screen;
-    
+
     void parseLayout(const LayoutGetLayoutsRes_Derived &d);
     void contactTriggered(const InterfaceContactTriggered &d);
     void getFeedbackContactList(const ControlGetBlockListRes &d);
     void getSwitchStates(const ControlGetSwitchStandListRes &d);
     void getTrainList(const ControlGetTrainListRes &d);
-
-    void updateScreen();
+    void setHardwareState(SystemHardwareStateChanged &&data) const;
 
 public:
-    MessageLoop(EndpointPtr endpoint);
+    MessageLoop(EndpointPtr endpoint, MonitorPtr monitor);
 
     MessageLoop(const MessageLoop&) = delete;
     MessageLoop& operator=(const MessageLoop&) = delete;

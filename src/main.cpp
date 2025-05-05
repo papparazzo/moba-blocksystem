@@ -28,6 +28,7 @@
 #include "moba/endpoint.h"
 #include "moba/layoutmessages.h"
 #include "msgloop.h"
+#include "monitor.h"
 
 namespace {
     moba::AppData appData = {
@@ -45,9 +46,12 @@ int main(int argc, char *argv[]) {
         appData.host = std::string(argv[1]);
     }
 
-    auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::CLIENT, Message::LAYOUT, Message::INTERFACE}}};
+    bool debug = false;
 
-    MessageLoop loop(endpoint);
+    auto socket = std::make_shared<Socket>(appData.host, appData.port);
+    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::CLIENT, Message::LAYOUT, Message::INTERFACE, Message::SYSTEM}}};
+    const auto monitor = std::make_shared<Monitor>(debug);
+
+    MessageLoop loop(endpoint, monitor);
     loop.run();
 }

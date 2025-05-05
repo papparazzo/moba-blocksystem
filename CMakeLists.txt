@@ -11,9 +11,10 @@ configure_file(config.h.in config.h)
 add_executable(
     moba-blocksystem
 
-    src/main.cpp
-    src/msgloop.cpp
     src/layoutparser.cpp
+    src/main.cpp
+    src/monitor.cpp
+    src/msgloop.cpp
     src/screen.cpp
 )
 
