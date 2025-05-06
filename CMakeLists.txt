@@ -15,7 +15,6 @@ add_executable(
     src/main.cpp
     src/monitor.cpp
     src/msgloop.cpp
-    src/screen.cpp
 )
 
 install(TARGETS moba-blocksystem)
