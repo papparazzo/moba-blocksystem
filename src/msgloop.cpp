@@ -25,8 +25,7 @@
 #include "moba/controlmessages.h"
 #include "layoutparser.h"
 
-MessageLoop::MessageLoop(EndpointPtr endpoint, MonitorPtr monitor):
-endpoint{endpoint}, monitor{monitor}, closing{false} {
+MessageLoop::MessageLoop(EndpointPtr endpoint): endpoint{std::move(endpoint)}, closing{false} {
 }
 
 void MessageLoop::run() {
